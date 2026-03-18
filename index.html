@@ -3,267 +3,535 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>חידון Skillhub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;700;900&display=swap" rel="stylesheet">
+    <title>חידון טריוויה ארגוני - Skillhub</title>
+    
+    <!-- Google Fonts: Heebo -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Heebo', 'sans-serif'] } } } }
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Heebo', 'sans-serif'],
+                    }
+                }
+            }
+        }
     </script>
+    
     <style>
-        body { font-family: 'Heebo', sans-serif; background-color: #0f172a; color: white; }
-        .btn-active { cursor: pointer; transition: transform 0.2s; }
-        .btn-active:active { transform: scale(0.95); }
-        .stage-locked { opacity: 0.5; cursor: not-allowed; }
+        body { font-family: 'Heebo', sans-serif; overflow-x: hidden; }
+        .hidden { display: none !important; }
+        .answer-btn:disabled { cursor: not-allowed; opacity: 0.6; }
+        .stage-card:hover:not(.opacity-50) { transform: translateY(-5px); }
+        #timer-bar { transition: width 1s linear, background-color 0.3s; }
+        .timer-low { background-color: #ef4444 !important; }
     </style>
 </head>
-<body>
+<body class="bg-gray-900 text-gray-100 h-screen w-screen font-sans">
 
-    <div id="loading-overlay" class="fixed inset-0 bg-slate-900 z-[200] flex items-center justify-center">
-        <div class="text-center">
-            <div class="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-indigo-500 mx-auto mb-4"></div>
-            <p>מתחבר למערכת...</p>
+    <!-- Toast Messages -->
+    <div id="toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white font-bold shadow-xl z-[500] transition-opacity duration-300"></div>
+
+    <!-- SCREEN: LOADING -->
+    <div id="loading-overlay" class="fixed inset-0 bg-gray-900 z-[1000] flex flex-col items-center justify-center">
+        <div class="animate-spin rounded-full h-16 w-16 border-t-4 border-indigo-500 mb-4"></div>
+        <p class="text-xl font-bold text-indigo-300">מתחבר ל-Firebase...</p>
+    </div>
+
+    <!-- SCREEN: LOGIN -->
+    <div id="screen-login" class="hidden h-full flex flex-col items-center justify-center p-4 relative">
+        <button onclick="window.openAdminLogin()" class="absolute top-4 left-4 text-gray-500 hover:text-gray-300 transition">⚙️ מנהל</button>
+        <div class="bg-gray-800 rounded-3xl shadow-2xl p-10 w-full max-w-md text-center border border-gray-700 transform transition hover:scale-[1.01]">
+            <h1 class="text-4xl font-black mb-2 text-indigo-400">טריוויה Skillhub</h1>
+            <p class="text-gray-400 mb-8 font-light">הזינו שם כדי להתחיל בצבירת נקודות</p>
+            <input type="text" id="player-name" placeholder="הזן את שמך המלא" class="w-full text-center text-xl p-4 bg-gray-700 border-2 border-gray-600 rounded-2xl mb-4 text-white focus:outline-none focus:border-indigo-400 font-bold transition">
+            <button onclick="window.joinGame()" class="w-full bg-indigo-600 text-white text-xl font-bold py-4 rounded-2xl hover:bg-indigo-700 transition shadow-lg active:scale-95">היכנס למשחק</button>
         </div>
     </div>
 
-    <div id="screen-login" class="hidden h-screen flex flex-col items-center justify-center p-4">
-        <div class="bg-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-700 text-center">
-            <h1 class="text-4xl font-black mb-2 text-indigo-400">ברוכים הבאים</h1>
-            <input type="text" id="player-name-input" placeholder="הזינו שם מלא" class="w-full text-center p-4 bg-slate-700 border-2 border-slate-600 rounded-2xl mb-4 text-white outline-none focus:border-indigo-400">
-            <button onclick="joinGame()" class="w-full bg-indigo-600 py-4 rounded-2xl font-bold btn-active shadow-lg">היכנס למשחק</button>
-            <button onclick="showScreen('adminLogin')" class="mt-4 text-slate-500 text-sm">ניהול מערכת</button>
-        </div>
-    </div>
-
-    <div id="screen-lobby" class="hidden h-screen flex flex-col">
-        <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
-            <div class="font-bold text-indigo-400" id="display-name"></div>
-            <div class="bg-indigo-900/40 px-4 py-1 rounded-full border border-indigo-500 font-bold">ניקוד: <span id="display-score">0</span></div>
+    <!-- SCREEN: LOBBY -->
+    <div id="screen-lobby" class="hidden h-full flex flex-col">
+        <header class="bg-gray-800 shadow-md p-4 flex justify-between items-center border-b border-gray-700 sticky top-0 z-50">
+            <div class="font-bold text-xl text-gray-400">שלום, <span id="player-name-display" class="text-indigo-400"></span></div>
+            <div class="bg-indigo-900/40 border border-indigo-700 text-indigo-200 px-5 py-2 rounded-full font-black shadow-inner">
+                ניקוד: <span id="lobby-total-score" class="font-mono">0</span>
+            </div>
         </header>
-        <main class="flex-1 p-6 flex flex-col items-center justify-center">
-            <div id="stages-grid" class="grid grid-cols-2 gap-4 w-full max-w-md text-center"></div>
+        <main class="flex-1 p-6 flex flex-col items-center justify-center overflow-y-auto">
+            <h2 class="text-3xl font-black mb-10 text-gray-100">בחרו שלב למשחק</h2>
+            <div id="stages-grid" class="grid grid-cols-2 gap-6 w-full max-w-2xl">
+                <!-- Stages injected by JS -->
+                <button id="stage-btn-1" onclick="window.attemptStage(1)" class="stage-card relative aspect-square rounded-3xl bg-slate-800 border-2 border-rose-500/30 text-rose-300 flex flex-col items-center justify-center p-6 transition-all duration-300 group">
+                    <span class="lock-icon text-4xl mb-2 opacity-60">🔒</span>
+                    <span class="check-icon text-5xl mb-2 hidden">✅</span>
+                    <h3 class="text-2xl font-black group-hover:text-rose-200 transition">שלב 1</h3>
+                </button>
+                <button id="stage-btn-2" onclick="window.attemptStage(2)" class="stage-card relative aspect-square rounded-3xl bg-slate-800 border-2 border-blue-500/30 text-blue-300 flex flex-col items-center justify-center p-6 transition-all duration-300 group">
+                    <span class="lock-icon text-4xl mb-2 opacity-60">🔒</span>
+                    <span class="check-icon text-5xl mb-2 hidden">✅</span>
+                    <h3 class="text-2xl font-black group-hover:text-blue-200 transition">שלב 2</h3>
+                </button>
+                <button id="stage-btn-3" onclick="window.attemptStage(3)" class="stage-card relative aspect-square rounded-3xl bg-slate-800 border-2 border-amber-500/30 text-amber-300 flex flex-col items-center justify-center p-6 transition-all duration-300 group">
+                    <span class="lock-icon text-4xl mb-2 opacity-60">🔒</span>
+                    <span class="check-icon text-5xl mb-2 hidden">✅</span>
+                    <h3 class="text-2xl font-black group-hover:text-amber-200 transition">שלב 3</h3>
+                </button>
+                <button id="stage-btn-4" onclick="window.attemptStage(4)" class="stage-card relative aspect-square rounded-3xl bg-slate-800 border-2 border-emerald-500/30 text-emerald-300 flex flex-col items-center justify-center p-6 transition-all duration-300 group">
+                    <span class="lock-icon text-4xl mb-2 opacity-60">🔒</span>
+                    <span class="check-icon text-5xl mb-2 hidden">✅</span>
+                    <h3 class="text-2xl font-black group-hover:text-emerald-200 transition">שלב 4</h3>
+                </button>
+            </div>
         </main>
     </div>
 
-    <div id="screen-game" class="hidden h-screen flex flex-col">
-        <header class="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700">
-            <div id="q-progress" class="text-slate-400"></div>
-            <div class="text-2xl font-black text-indigo-300">⏱️ <span id="timer-num">20</span></div>
-            <button onclick="showScreen('lobby')" class="text-slate-500">✖️</button>
+    <!-- SCREEN: GAME -->
+    <div id="screen-game" class="hidden h-full flex flex-col bg-gray-900 relative">
+        <div id="feedback-pop" class="hidden fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
+            <div id="feedback-content" class="text-6xl font-black text-white px-12 py-6 rounded-3xl shadow-2xl transform scale-150 animate-bounce"></div>
+        </div>
+        
+        <header class="bg-gray-800 p-4 shadow-md flex justify-between items-center z-10 border-b border-gray-700">
+            <div id="question-number" class="font-bold text-gray-400">טוען...</div>
+            <div class="flex items-center gap-3 font-black text-3xl text-gray-100">
+                ⏱️ <span id="timer-text">20</span>
+            </div>
+            <button onclick="window.showScreen('lobby')" class="text-gray-500 hover:text-white transition">✖️</button>
         </header>
-        <div class="h-2 w-full bg-slate-700"><div id="timer-bar" class="h-full bg-indigo-500 transition-all duration-1000 ease-linear" style="width:100%"></div></div>
-        <div class="flex-1 flex items-center justify-center p-6 text-center">
-            <h2 id="question-text" class="text-3xl font-black leading-tight"></h2>
-        </div>
-        <div id="options-grid" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto w-full mb-8"></div>
-    </div>
 
-    <div id="screen-leaderboard" class="hidden h-screen flex flex-col p-6 items-center justify-center">
-        <h2 class="text-4xl font-black mb-8">טבלת המובילים 🏆</h2>
-        <div class="bg-slate-800 w-full max-w-xl rounded-2xl overflow-hidden border border-slate-700 shadow-2xl">
-            <table class="w-full text-right"><tbody id="leaderboard-body" class="divide-y divide-slate-700"></tbody></table>
+        <div class="h-3 w-full bg-gray-700">
+            <div id="timer-bar" class="h-full bg-indigo-500" style="width: 100%;"></div>
         </div>
-        <button onclick="nextStep()" class="mt-8 bg-indigo-600 px-12 py-4 rounded-full font-bold text-xl btn-active">המשך</button>
-    </div>
 
-    <div id="screen-adminLogin" class="hidden h-screen flex flex-col items-center justify-center p-4">
-        <div class="bg-slate-800 p-6 rounded-xl border border-slate-700 w-full max-w-sm">
-            <input type="password" id="admin-pass" placeholder="סיסמה (1234)" class="w-full p-4 bg-slate-700 rounded-xl mb-4 text-center border border-slate-600 outline-none">
-            <button onclick="loginAdmin()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold btn-active">כניסה</button>
-            <button onclick="showScreen('login')" class="w-full mt-2 text-slate-500 text-sm">חזרה</button>
+        <div class="flex-1 p-8 flex items-center justify-center text-center">
+            <h2 id="question-text" class="text-3xl md:text-5xl font-black text-gray-100 leading-tight drop-shadow-2xl">טוען שאלה...</h2>
+        </div>
+
+        <div class="p-6 pb-12 w-full max-w-5xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-6" id="options-container">
+            <!-- Buttons injected by JS -->
         </div>
     </div>
 
-    <div id="screen-adminDashboard" class="hidden h-screen flex flex-col p-6 overflow-y-auto">
-        <div class="flex justify-between items-center mb-6 border-b border-slate-700 pb-2">
-            <h1 class="text-xl font-bold text-indigo-400">פאנל ניהול ⚙️</h1>
-            <button onclick="showScreen('login')" class="bg-slate-700 px-3 py-1 rounded text-sm">יציאה</button>
-        </div>
-        <div id="admin-content" class="space-y-6">
-            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <h3 class="font-bold mb-3">מצב שלבים</h3>
-                <div id="admin-toggles" class="space-y-2"></div>
-            </div>
-            <div class="bg-slate-800 p-4 rounded-xl border border-slate-700">
-                <h3 class="font-bold mb-3">שאלות (10 ראשונות)</h3>
-                <div id="admin-questions-list" class="space-y-2"></div>
+    <!-- SCREEN: LEADERBOARD -->
+    <div id="screen-leaderboard" class="hidden h-full flex flex-col bg-gray-900 items-center justify-center p-6">
+        <h2 class="text-5xl font-black mb-10 text-center text-gray-100 drop-shadow-lg">טבלת מובילים 🏆</h2>
+        
+        <div class="bg-gray-800 text-gray-200 w-full max-w-2xl rounded-3xl shadow-2xl overflow-hidden mb-10 border border-gray-700">
+            <table class="w-full text-right">
+                <thead class="bg-gray-700 text-gray-400 border-b border-gray-600">
+                    <tr>
+                        <th class="py-4 px-6 w-20 text-center">מקום</th>
+                        <th class="py-4 px-6">שם השחקן</th>
+                        <th class="py-4 px-6 text-left w-32">ניקוד</th>
+                    </tr>
+                </thead>
+                <tbody id="leaderboard-body" class="divide-y divide-gray-700"></tbody>
+            </table>
+            <div class="bg-gray-800 p-6 border-t border-gray-700 flex justify-between items-center text-lg font-bold">
+                <span class="text-gray-400">המיקום שלי: <span id="my-current-rank" class="text-indigo-400"></span></span>
+                <span class="text-gray-400">הניקוד שלי: <span id="my-current-score" class="text-indigo-400"></span></span>
             </div>
         </div>
+
+        <button id="btn-next-step" onclick="window.nextAction()" class="bg-indigo-600 text-white px-14 py-5 rounded-full font-black text-2xl hover:scale-105 hover:bg-indigo-500 transition transform shadow-2xl active:scale-95">המשך</button>
     </div>
 
+    <!-- SCREEN: ADMIN LOGIN -->
+    <div id="screen-adminLogin" class="hidden h-full flex flex-col items-center justify-center bg-gray-900 p-4">
+        <div class="bg-gray-800 rounded-2xl shadow-2xl p-10 w-full max-w-sm text-center border border-gray-700">
+            <h2 class="text-2xl font-black mb-6 text-gray-100">כניסת מנהל</h2>
+            <input type="password" id="admin-password" placeholder="סיסמה (1234)" class="w-full text-center p-4 bg-gray-700 border-gray-600 text-white rounded-xl mb-6 focus:border-indigo-500 outline-none border-2 transition">
+            <button onclick="window.loginAdmin()" class="w-full bg-indigo-600 text-white font-bold py-4 rounded-xl hover:bg-indigo-700 transition">היכנס למערכת</button>
+            <button onclick="window.showScreen('login')" class="mt-6 text-sm text-gray-500 hover:text-gray-400 transition">חזור למשחק</button>
+        </div>
+    </div>
+
+    <!-- SCREEN: ADMIN DASHBOARD -->
+    <div id="screen-adminDashboard" class="hidden h-full flex flex-col bg-gray-900">
+        <header class="bg-gray-800 text-gray-100 p-5 flex justify-between items-center shadow-lg border-b border-gray-700 sticky top-0 z-50">
+            <h2 class="text-2xl font-black text-indigo-400">פאנל ניהול ⚙️</h2>
+            <div class="flex gap-4">
+                <button onclick="window.resetAllScores()" class="bg-red-900/40 text-red-200 border border-red-700 hover:bg-red-800 px-4 py-2 rounded-lg text-sm font-bold transition">איפוס ניקוד</button>
+                <button onclick="window.showScreen('login')" class="bg-gray-700 text-gray-300 hover:bg-gray-600 px-4 py-2 rounded-lg text-sm transition">יציאה</button>
+            </div>
+        </header>
+
+        <main class="flex-1 p-8 overflow-y-auto max-w-6xl mx-auto w-full grid md:grid-cols-3 gap-8">
+            <div class="md:col-span-1 bg-gray-800 p-6 rounded-2xl shadow border border-gray-700 h-fit">
+                <h3 class="text-lg font-bold mb-6 border-b border-gray-700 pb-3 text-indigo-400 uppercase tracking-wider">סטטוס שלבים</h3>
+                <div id="admin-toggles" class="space-y-5"></div>
+            </div>
+
+            <div class="md:col-span-2 bg-gray-800 p-6 rounded-2xl shadow border border-gray-700">
+                <h3 class="text-lg font-bold mb-6 border-b border-gray-700 pb-3 text-indigo-400 uppercase tracking-wider">עורך שאלות</h3>
+                <div id="admin-questions-list" class="space-y-6">
+                    <p class="text-gray-500 text-center py-10">טוען נתונים...</p>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Firebase SDK -->
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, getDocs, collection, onSnapshot, updateDoc, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
+        // CONFIGURATION
         const firebaseConfig = {
             apiKey: "AIzaSyC6YSQUpGpU8csuqol0ZX9uvh_GKDTol_Q",
             authDomain: "quizzinfo.firebaseapp.com",
             projectId: "quizzinfo",
             storageBucket: "quizzinfo.firebasestorage.app",
             messagingSenderId: "941264094079",
-            appId: "1:941264094079:web:d526857756987ca108504a"
+            appId: "1:941264094079:web:d526857756987ca108504a",
+            measurementId: "G-G72Q3BKYXE"
         };
 
-        let app, auth, db, user, myData = { score: 0, completedStages: [] }, allQuestions = [], gameSettings = {};
-        let currentStage = null, currentQIndex = 0, timer = 20, timerId = null;
+        const appId = 'skillhub-master-quiz-v1'; 
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
 
+        // State
+        let user = null;
+        let myData = { name: '', score: 0, completedStages: [] };
+        let players = [];
+        let gameSettings = { stage1: true, stage2: false, stage3: false, stage4: false };
+        let allQuestions = [];
+        
+        let currentStageId = null;
+        let currentQIndex = 0;
+        let timer = 20;
+        let timerId = null;
+
+        // Path Helpers
+        const docRef = (coll, id) => doc(db, 'quizzes', appId, coll, id);
+        const collRef = (coll) => collection(db, 'quizzes', appId, coll);
+
+        // NAVIGATION
         window.showScreen = (id) => {
             document.querySelectorAll('body > div[id^="screen-"]').forEach(d => d.classList.add('hidden'));
             const target = document.getElementById(`screen-${id}`);
             if(target) target.classList.remove('hidden');
+            if(id === 'lobby') renderLobby();
         };
 
+        // INITIALIZATION
         async function init() {
             try {
-                app = initializeApp(firebaseConfig);
-                auth = getAuth(app);
-                db = getFirestore(app);
-                
                 await signInAnonymously(auth);
                 onAuthStateChanged(auth, async (u) => {
                     if (u) {
                         user = u;
                         document.getElementById('loading-overlay').classList.add('hidden');
-                        setupListeners();
-                        const saved = localStorage.getItem('quiz_user_name');
-                        if (saved) {
-                            const d = await getDoc(doc(db, "players", user.uid));
-                            if (d.exists()) { myData = d.data(); showScreen('lobby'); }
-                            else showScreen('login');
-                        } else showScreen('login');
+                        setupRealtimeListeners();
+                        checkPersistence();
                     }
                 });
-            } catch (e) {
-                alert("שגיאת התחברות ל-Firebase. ודא שהגדרות ה-Rules וה-Auth תקינות.");
-                console.error(e);
+            } catch (err) {
+                console.error("Firebase Auth Fail:", err);
+                alert("שגיאת חיבור למסד הנתונים. ודא שהגדרת Anonymous Auth ב-Firebase.");
             }
         }
 
-        function setupListeners() {
-            onSnapshot(doc(db, "settings", "game_state"), (s) => {
-                gameSettings = s.exists() ? s.data() : { stage1: true, stage2: false, stage3: false, stage4: false };
-                if (!s.exists()) setDoc(doc(db, "settings", "game_state"), gameSettings);
-                renderStages();
-                renderAdminUI();
+        async function checkPersistence() {
+            const savedName = localStorage.getItem('quiz_user_name');
+            if (savedName) {
+                const uDoc = await getDoc(docRef('players', user.uid));
+                if (uDoc.exists()) {
+                    myData = uDoc.data();
+                    window.showScreen('lobby');
+                } else window.showScreen('login');
+            } else window.showScreen('login');
+        }
+
+        function setupRealtimeListeners() {
+            // Settings Sync
+            onSnapshot(docRef('settings', 'config'), (snap) => {
+                if (snap.exists()) {
+                    gameSettings = snap.data();
+                    renderLobby();
+                    renderAdminToggles();
+                } else setDoc(docRef('settings', 'config'), gameSettings);
             });
 
-            onSnapshot(doc(db, "content", "questions"), (s) => {
-                if (s.exists()) { allQuestions = s.data().list; renderAdminUI(); }
-                else seedInitialData();
+            // Questions Sync
+            onSnapshot(docRef('content', 'questions'), (snap) => {
+                if (snap.exists()) {
+                    allQuestions = snap.data().list || [];
+                } else seedDefaultQuestions();
+                renderAdminQuestions();
             });
 
-            onSnapshot(doc(db, "players", user.uid), (s) => {
-                if (s.exists()) { myData = s.data(); updateUI(); }
+            // Players Sync
+            onSnapshot(collRef('players'), (snap) => {
+                players = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+                const me = players.find(p => p.id === user.uid);
+                if (me) myData = me;
+                renderLeaderboardUI();
+                renderLobby();
             });
         }
 
-        async function seedInitialData() {
+        async function seedDefaultQuestions() {
             const list = [];
-            for(let s=1; s<=4; s++) for(let q=1; q<=5; q++) 
-                list.push({ stage: s, text: `שאלה ${q} שלב ${s}`, options: ["א", "ב", "ג", "ד"], correct: 0 });
-            await setDoc(doc(db, "content", "questions"), { list });
+            for (let s = 1; s <= 4; s++) {
+                for (let q = 1; q <= 5; q++) {
+                    list.push({
+                        id: `s${s}q${q}`, stage: s,
+                        text: `שאלה ${q} שלב ${s} (ניתן לערוך בניהול)`,
+                        options: ["אופציה א", "אופציה ב", "אופציה ג", "אופציה ד"],
+                        correct: 0, time: 20
+                    });
+                }
+            }
+            await setDoc(docRef('content', 'questions'), { list });
         }
 
+        // USER ACTIONS
         window.joinGame = async () => {
-            const name = document.getElementById('player-name-input').value.trim();
-            if (!name) return alert("נא להזין שם");
-            myData = { name, score: 0, completedStages: [] };
-            await setDoc(doc(db, "players", user.uid), myData);
+            const name = document.getElementById('player-name').value.trim();
+            if (!name) return showToast("נא להזין שם מלא", "bg-red-600");
+            
+            myData = { name, score: 0, completedStages: [], joinedAt: Date.now() };
+            await setDoc(docRef('players', user.uid), myData);
             localStorage.setItem('quiz_user_name', name);
-            showScreen('lobby');
+            window.showScreen('lobby');
         };
 
-        function updateUI() {
-            document.getElementById('display-name').innerText = myData.name || '';
-            document.getElementById('display-score').innerText = myData.score || 0;
-        }
+        function renderLobby() {
+            document.getElementById('player-name-display').innerText = myData.name || '';
+            document.getElementById('lobby-total-score').innerText = (myData.score || 0).toLocaleString();
 
-        function renderStages() {
-            const grid = document.getElementById('stages-grid'); grid.innerHTML = '';
             for (let i = 1; i <= 4; i++) {
-                const isOpen = gameSettings[`stage${i}`], isDone = myData.completedStages?.includes(i);
-                const btn = document.createElement('button');
-                btn.className = `p-6 rounded-2xl border-2 transition-all font-bold ${isDone ? 'bg-emerald-900/30 border-emerald-500' : isOpen ? 'bg-indigo-900/30 border-indigo-500 hover:scale-105' : 'bg-slate-800 border-slate-700 opacity-50 cursor-not-allowed'}`;
-                btn.innerHTML = `שלב ${i}<br><span class="text-xs">${isDone ? '✅ הושלם' : isOpen ? '🔓 פתוח' : '🔒 נעול'}</span>`;
-                if (isOpen && !isDone) btn.onclick = () => { currentStage = i; currentQIndex = 0; showScreen('game'); loadQuestion(); };
-                grid.appendChild(btn);
+                const btn = document.getElementById(`stage-btn-${i}`);
+                if (!btn) continue;
+                const isOpen = gameSettings[`stage${i}`];
+                const isDone = myData.completedStages?.includes(i);
+                
+                btn.className = `stage-card relative aspect-square rounded-3xl border-2 transition-all p-4 flex flex-col items-center justify-center ${
+                    isDone ? 'bg-emerald-900/30 border-emerald-500 text-emerald-300' :
+                    isOpen ? 'bg-slate-800 border-indigo-500 hover:bg-slate-700' : 'bg-slate-900 border-gray-800 opacity-50 cursor-not-allowed'
+                }`;
+                btn.querySelector('.lock-icon').classList.toggle('hidden', isOpen || isDone);
+                btn.querySelector('.check-icon').classList.toggle('hidden', !isDone);
             }
         }
 
+        window.attemptStage = (num) => {
+            if (myData.completedStages?.includes(num)) return showToast("כבר סיימת את השלב הזה!", "bg-emerald-600");
+            if (!gameSettings[`stage${num}`]) return showToast("השלב הזה עדיין נעול", "bg-amber-600");
+            
+            const stageQs = allQuestions.filter(q => q.stage == num);
+            if (stageQs.length === 0) return showToast("אין שאלות בשלב זה", "bg-gray-600");
+
+            currentStageId = num;
+            currentQIndex = 0;
+            window.showScreen('game');
+            loadQuestion();
+        };
+
+        // GAME LOGIC
         function loadQuestion() {
             clearInterval(timerId);
-            const stageQs = allQuestions.filter(q => q.stage == currentStage);
-            if (!stageQs[currentQIndex]) return finishStage();
+            const stageQs = allQuestions.filter(q => q.stage == currentStageId);
             const q = stageQs[currentQIndex];
-            document.getElementById('q-progress').innerText = `שאלה ${currentQIndex + 1}/5`;
+            
+            document.getElementById('question-number').innerText = `שאלה ${currentQIndex + 1} מתוך ${stageQs.length}`;
             document.getElementById('question-text').innerText = q.text;
-            const grid = document.getElementById('options-grid'); grid.innerHTML = '';
-            q.options.forEach((opt, i) => {
+            
+            const grid = document.getElementById('options-container');
+            grid.innerHTML = '';
+            const borderColors = ['border-rose-500/40', 'border-blue-500/40', 'border-amber-500/40', 'border-emerald-500/40'];
+            const textColors = ['text-rose-200', 'text-blue-200', 'text-amber-200', 'text-emerald-200'];
+
+            q.options.forEach((opt, idx) => {
                 const b = document.createElement('button');
-                b.className = "p-4 rounded-xl bg-slate-800 border border-slate-600 hover:bg-slate-700 font-bold transition btn-active";
-                b.innerText = opt; b.onclick = () => checkAnswer(i, q.correct);
+                b.className = `answer-btn w-full p-6 md:p-10 rounded-2xl bg-slate-800 border-2 ${borderColors[idx]} ${textColors[idx]} font-bold text-xl md:text-2xl transition hover:bg-slate-700 active:scale-95`;
+                b.innerText = opt;
+                b.onclick = () => checkAnswer(idx, q.correct);
                 grid.appendChild(b);
             });
-            timer = 20; updateTimer();
-            timerId = setInterval(() => { timer--; updateTimer(); if (timer <= 0) checkAnswer(-1, q.correct); }, 1000);
+
+            timer = q.time || 20;
+            updateTimerUI();
+            timerId = setInterval(() => {
+                timer--;
+                updateTimerUI();
+                if (timer <= 0) { clearInterval(timerId); checkAnswer(-1, q.correct); }
+            }, 1000);
         }
 
-        function updateTimer() {
-            document.getElementById('timer-num').innerText = timer;
-            document.getElementById('timer-bar').style.width = `${(timer / 20) * 100}%`;
+        function updateTimerUI() {
+            const bar = document.getElementById('timer-bar');
+            document.getElementById('timer-text').innerText = timer;
+            bar.style.width = `${(timer / 20) * 100}%`;
+            if (timer < 6) bar.classList.add('bg-red-500'); else bar.classList.remove('bg-red-500');
         }
 
         async function checkAnswer(idx, correct) {
             clearInterval(timerId);
-            if (idx === correct) {
-                myData.score += (1000 + timer * 50);
-                await updateDoc(doc(db, "players", user.uid), { score: myData.score });
+            document.querySelectorAll('.answer-btn').forEach(b => b.disabled = true);
+
+            const isCorrect = idx === correct;
+            const pop = document.getElementById('feedback-pop');
+            const content = document.getElementById('feedback-content');
+
+            if (isCorrect) {
+                const earned = 1000 + (timer * 50);
+                myData.score += earned;
+                content.innerText = `+${earned.toLocaleString()}`;
+                content.className = "text-6xl font-black bg-emerald-600 text-white px-12 py-6 rounded-3xl shadow-2xl animate-bounce";
+                await updateDoc(docRef('players', user.uid), { score: myData.score });
+            } else {
+                content.innerText = idx === -1 ? "נגמר הזמן!" : "טעות!";
+                content.className = "text-6xl font-black bg-rose-600 text-white px-12 py-6 rounded-3xl shadow-2xl animate-pulse";
             }
-            showLeaderboard();
+
+            pop.classList.remove('hidden');
+            setTimeout(() => {
+                pop.classList.add('hidden');
+                window.showScreen('leaderboard');
+            }, 2000);
         }
 
-        async function showLeaderboard() {
-            const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
-            const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
-            let r = 1;
-            qSnap.forEach(d => {
-                const p = d.data();
-                body.innerHTML += `<tr class="p-4 ${d.id===user.uid?'text-indigo-400 font-bold':''}">
-                    <td class="p-4">${r++}</td><td class="p-4">${p.name}</td><td class="p-4 text-left font-mono">${p.score}</td>
-                </tr>`;
-            });
-            showScreen('leaderboard');
-        }
-
-        window.nextStep = () => {
+        window.nextAction = async () => {
             currentQIndex++;
-            const stageQs = allQuestions.filter(q => q.stage == currentStage);
-            if (currentQIndex < stageQs.length) loadQuestion(); else finishStage();
+            const stageQs = allQuestions.filter(q => q.stage == currentStageId);
+            if (currentQIndex < stageQs.length) {
+                window.showScreen('game');
+                loadQuestion();
+            } else {
+                if (!myData.completedStages.includes(currentStageId)) {
+                    myData.completedStages.push(currentStageId);
+                    await updateDoc(docRef('players', user.uid), { completedStages: myData.completedStages });
+                }
+                window.showScreen('lobby');
+            }
         };
 
-        async function finishStage() {
-            if (!myData.completedStages.includes(currentStage)) {
-                myData.completedStages.push(currentStage);
-                await updateDoc(doc(db, "players", user.uid), { completedStages: myData.completedStages });
-            }
-            showScreen('lobby');
-        }
+        function renderLeaderboardUI() {
+            const sorted = [...players].sort((a,b) => (b.score || 0) - (a.score || 0));
+            const top5 = sorted.slice(0, 5);
+            const tbody = document.getElementById('leaderboard-body');
+            tbody.innerHTML = '';
 
-        window.loginAdmin = () => { if(document.getElementById('admin-pass').value === "1234") showScreen('adminDashboard'); else alert("טעות"); };
-
-        function renderAdminUI() {
-            const toggles = document.getElementById('admin-toggles'); toggles.innerHTML = '';
-            for(let i=1; i<=4; i++) {
-                toggles.innerHTML += `<div class="flex justify-between p-2 bg-slate-700 rounded"><span>שלב ${i}</span><input type="checkbox" ${gameSettings[`stage${i}`]?'checked':''} onchange="updateStage(${i}, this.checked)"></div>`;
-            }
-            const qList = document.getElementById('admin-questions-list'); qList.innerHTML = '';
-            allQuestions.slice(0, 10).forEach((q, i) => {
-                qList.innerHTML += `<input class="w-full bg-slate-700 p-2 rounded mb-1 text-sm" value="${q.text}" onchange="updateQ(${i}, this.value)">`;
+            top5.forEach((p, i) => {
+                const tr = document.createElement('tr');
+                tr.className = `p-4 ${p.id === user.uid ? 'bg-indigo-900/30 text-indigo-200' : ''}`;
+                tr.innerHTML = `
+                    <td class="p-4 text-center font-black">${i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : i+1}</td>
+                    <td class="p-4 font-bold">${p.name}</td>
+                    <td class="p-4 text-left font-mono font-black text-indigo-400">${(p.score || 0).toLocaleString()}</td>
+                `;
+                tbody.appendChild(tr);
             });
+
+            const myRank = sorted.findIndex(p => p.id === user.uid) + 1;
+            document.getElementById('my-current-rank').innerText = myRank || '-';
+            document.getElementById('my-current-score').innerText = (myData.score || 0).toLocaleString();
         }
 
-        window.updateStage = async (n, v) => { gameSettings[`stage${n}`] = v; await setDoc(doc(db, "settings", "game_state"), gameSettings); };
-        window.updateQ = async (i, v) => { allQuestions[i].text = v; await setDoc(doc(db, "content", "questions"), { list: allQuestions }); };
+        // ADMIN LOGIC
+        window.openAdminLogin = () => window.showScreen('adminLogin');
+        
+        window.loginAdmin = () => {
+            const p = document.getElementById('admin-password').value;
+            if (p === '1234' || p === 'admin123') {
+                document.getElementById('admin-password').value = '';
+                window.showScreen('adminDashboard');
+            } else showToast("סיסמה שגויה", "bg-red-600");
+        };
+
+        function renderAdminToggles() {
+            const cont = document.getElementById('admin-toggles');
+            cont.innerHTML = '';
+            for (let i = 1; i <= 4; i++) {
+                const active = gameSettings[`stage${i}`];
+                const div = document.createElement('div');
+                div.className = "flex justify-between items-center p-4 bg-gray-700/50 rounded-xl border border-gray-600";
+                div.innerHTML = `
+                    <span class="font-bold">פתיחת שלב ${i}</span>
+                    <input type="checkbox" ${active ? 'checked' : ''} onchange="window.updateStageSetting(${i}, this.checked)" class="w-6 h-6 accent-indigo-500 cursor-pointer">
+                `;
+                cont.appendChild(div);
+            }
+        }
+
+        window.updateStageSetting = async (num, val) => {
+            gameSettings[`stage${num}`] = val;
+            await updateDoc(docRef('settings', 'config'), gameSettings);
+        };
+
+        function renderAdminQuestions() {
+            const cont = document.getElementById('admin-questions-list');
+            cont.innerHTML = '';
+            
+            for (let s = 1; s <= 4; s++) {
+                const sQs = allQuestions.filter(q => q.stage == s);
+                if (sQs.length === 0) continue;
+                
+                const h = document.createElement('h4');
+                h.className = "text-indigo-400 font-black mt-4 mb-2 border-b border-gray-700 pb-1";
+                h.innerText = `שלב ${s}`;
+                cont.appendChild(h);
+
+                sQs.forEach((q) => {
+                    const qIdx = allQuestions.findIndex(item => item.id === q.id);
+                    const div = document.createElement('div');
+                    div.className = "bg-gray-700 p-5 rounded-xl mb-4 space-y-3 shadow-inner";
+                    div.innerHTML = `
+                        <input type="text" value="${q.text}" onchange="window.saveQuestion(${qIdx}, 'text', this.value)" class="w-full bg-gray-800 p-3 rounded border border-gray-600 outline-none focus:border-indigo-500">
+                        <div class="grid grid-cols-2 gap-2">
+                            ${q.options.map((opt, oi) => `
+                                <input value="${opt}" onchange="window.saveQOption(${qIdx}, ${oi}, this.value)" class="bg-gray-800 p-2 rounded text-sm border border-gray-600 focus:border-indigo-400 outline-none">
+                            `).join('')}
+                        </div>
+                        <div class="flex items-center gap-4 text-sm text-gray-400">
+                            <span>תשובה נכונה (0-3):</span>
+                            <input type="number" min="0" max="3" value="${q.correct}" onchange="window.saveQuestion(${qIdx}, 'correct', parseInt(this.value))" class="w-16 bg-gray-800 p-1 rounded border border-gray-600 text-center">
+                        </div>
+                    `;
+                    cont.appendChild(div);
+                });
+            }
+        }
+
+        window.saveQuestion = async (idx, key, val) => {
+            allQuestions[idx][key] = val;
+            await updateDoc(docRef('content', 'questions'), { list: allQuestions });
+            showToast("נשמר!", "bg-indigo-600");
+        };
+
+        window.saveQOption = async (qIdx, optIdx, val) => {
+            allQuestions[qIdx].options[optIdx] = val;
+            await updateDoc(docRef('content', 'questions'), { list: allQuestions });
+            showToast("אופציה נשמרה", "bg-indigo-600");
+        };
+
+        window.resetAllScores = async () => {
+            if (!confirm("לאפס את כל התוצאות?")) return;
+            const snap = await getDocs(collRef('players'));
+            const ps = snap.docs.map(d => updateDoc(docRef('players', d.id), { score: 0, completedStages: [] }));
+            await Promise.all(ps);
+            showToast("הכל אופס", "bg-red-600");
+        };
+
+        // UTILS
+        function showToast(msg, color) {
+            const t = document.getElementById('toast');
+            t.innerText = msg;
+            t.className = `fixed top-10 left-1/2 -translate-x-1/2 px-8 py-3 rounded-full text-white font-bold shadow-2xl z-[500] transition-opacity ${color}`;
+            t.classList.remove('hidden', 'opacity-0');
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.classList.add('hidden'), 300); }, 3000);
+        }
 
         init();
     </script>
