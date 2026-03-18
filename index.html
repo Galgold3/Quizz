@@ -3,39 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>חידון טריוויה - IGS Skillhub</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
-    
+    <title>חידון טריוויה - Skillhub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;700;900&display=swap" rel="stylesheet">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: { sans: ['Heebo', 'sans-serif'] }
-                }
-            }
-        }
+        tailwind.config = { theme: { extend: { fontFamily: { sans: ['Heebo', 'sans-serif'] } } } }
     </script>
-
     <style>
-        body { font-family: 'Heebo', sans-serif; overflow-x: hidden; }
-        .answer-btn:disabled { cursor: not-allowed; opacity: 0.6; }
-        .stage-card:hover:not(.opacity-50) { transform: translateY(-5px); }
+        body { font-family: 'Heebo', sans-serif; }
+        .answer-btn:disabled { opacity: 0.5; cursor: not-allowed; }
     </style>
 </head>
 <body class="bg-slate-900 text-white min-h-screen">
 
-    <div id="toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full font-bold z-[100] transition-all shadow-2xl"></div>
+    <div id="toast" class="hidden fixed top-5 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full font-bold z-[100] shadow-2xl transition-all"></div>
 
     <div id="screen-login" class="flex flex-col items-center justify-center min-h-screen p-4">
-        <button onclick="showScreen('adminLogin')" class="absolute top-4 left-4 text-slate-700 hover:text-slate-400">⚙️</button>
+        <button onclick="showScreen('adminLogin')" class="absolute top-4 left-4 text-slate-700">⚙️</button>
         <div class="bg-slate-800 p-8 rounded-3xl shadow-2xl w-full max-w-md border border-slate-700 text-center">
             <h1 class="text-4xl font-black mb-2 text-indigo-400">ברוכים הבאים</h1>
-            <p class="text-slate-400 mb-8">הזינו שם כדי להתחיל בצבירת נקודות</p>
-            <input type="text" id="player-name-input" placeholder="שם מלא / כינוי" class="w-full text-center p-4 bg-slate-700 border-2 border-slate-600 rounded-2xl mb-4 text-white focus:border-indigo-400 outline-none transition">
+            <input type="text" id="player-name-input" placeholder="הזינו שם מלא" class="w-full text-center p-4 bg-slate-700 border-2 border-slate-600 rounded-2xl mb-4 text-white outline-none focus:border-indigo-400 transition">
             <button onclick="joinGame()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-4 rounded-2xl font-bold shadow-lg transition">היכנס למשחק</button>
         </div>
     </div>
@@ -43,29 +30,22 @@
     <div id="screen-lobby" class="hidden flex flex-col min-h-screen">
         <header class="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
             <div class="font-bold">שלום, <span id="display-name" class="text-indigo-400"></span></div>
-            <div class="bg-indigo-900/40 px-4 py-1 rounded-full border border-indigo-500 text-indigo-200">
-                ניקוד: <span id="display-score" class="font-mono font-bold">0</span>
-            </div>
+            <div class="bg-indigo-900/40 px-4 py-1 rounded-full border border-indigo-500">ניקוד: <span id="display-score">0</span></div>
         </header>
         <main class="flex-1 p-6 flex flex-col items-center justify-center">
-            <h2 class="text-2xl font-bold mb-8">בחרו שלב למשחק:</h2>
-            <div id="stages-grid" class="grid grid-cols-2 gap-4 w-full max-w-md text-center">
-                </div>
+            <div id="stages-grid" class="grid grid-cols-2 gap-4 w-full max-w-md"></div>
         </main>
     </div>
 
     <div id="screen-game" class="hidden flex flex-col min-h-screen relative">
-        <div id="feedback-msg" class="hidden fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-            <div class="text-6xl font-black px-10 py-5 rounded-2xl shadow-2xl animate-bounce"></div>
-        </div>
-        <header class="bg-slate-800 p-4 flex justify-between items-center border-b border-slate-700">
-            <div id="q-progress" class="text-slate-400">שאלה 1/5</div>
+        <header class="bg-slate-800 p-4 flex justify-between items-center">
+            <div id="q-progress">שאלה 1/5</div>
             <div class="text-2xl font-black text-indigo-300">⏱️ <span id="timer-num">20</span></div>
-            <button onclick="exitToLobby()" class="text-slate-500">✖️</button>
+            <button onclick="showScreen('lobby')" class="text-slate-500">✖️</button>
         </header>
-        <div class="h-2 w-full bg-slate-700"><div id="timer-bar" class="h-full bg-indigo-500 transition-all duration-1000 ease-linear"></div></div>
+        <div class="h-2 w-full bg-slate-700"><div id="timer-bar" class="h-full bg-indigo-500 transition-all duration-1000 ease-linear" style="width:100%"></div></div>
         <div class="flex-1 flex items-center justify-center p-6 text-center">
-            <h2 id="question-text" class="text-3xl md:text-5xl font-black leading-tight drop-shadow-lg"></h2>
+            <h2 id="question-text" class="text-3xl font-black"></h2>
         </div>
         <div id="options-grid" class="p-4 grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto w-full mb-8"></div>
     </div>
@@ -73,136 +53,92 @@
     <div id="screen-leaderboard" class="hidden flex flex-col min-h-screen p-6 items-center justify-center">
         <h2 class="text-4xl font-black mb-8">טבלת המובילים 🏆</h2>
         <div class="bg-slate-800 w-full max-w-2xl rounded-3xl overflow-hidden border border-slate-700 shadow-2xl">
-            <table class="w-full text-right">
-                <thead class="bg-slate-700 text-slate-300">
-                    <tr><th class="p-4">מקום</th><th class="p-4">שם</th><th class="p-4">ניקוד</th></tr>
-                </thead>
-                <tbody id="leaderboard-body" class="divide-y divide-slate-700"></tbody>
-            </table>
+            <table class="w-full text-right"><tbody id="leaderboard-body" class="divide-y divide-slate-700"></tbody></table>
         </div>
-        <button onclick="nextStep()" class="mt-8 bg-indigo-600 px-12 py-4 rounded-full font-black text-xl hover:bg-indigo-500 shadow-xl transition transform hover:scale-105">המשך</button>
+        <button onclick="nextStep()" class="mt-8 bg-indigo-600 px-12 py-4 rounded-full font-black text-xl hover:bg-indigo-500 shadow-xl transition">המשך</button>
     </div>
 
     <div id="screen-adminLogin" class="hidden flex flex-col items-center justify-center min-h-screen p-4">
-        <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 w-full max-w-sm text-center">
-            <h2 class="text-2xl font-bold mb-6">כניסת מנהל</h2>
-            <input type="password" id="admin-pass" placeholder="סיסמה (1234)" class="w-full p-4 bg-slate-700 rounded-xl mb-4 text-center border border-slate-600 focus:border-indigo-400 outline-none">
-            <button onclick="loginAdmin()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold mb-2">כניסה</button>
-            <button onclick="showScreen('login')" class="text-slate-500 text-sm">חזרה</button>
+        <div class="bg-slate-800 p-8 rounded-2xl border border-slate-700 w-full max-w-sm">
+            <input type="password" id="admin-pass" placeholder="סיסמה (1234)" class="w-full p-4 bg-slate-700 rounded-xl mb-4 text-center border border-slate-600 outline-none">
+            <button onclick="loginAdmin()" class="w-full bg-indigo-600 py-3 rounded-xl font-bold">כניסה</button>
         </div>
     </div>
 
-    <div id="screen-adminDashboard" class="hidden flex flex-col min-h-screen p-6 bg-slate-900 overflow-y-auto">
+    <div id="screen-adminDashboard" class="hidden flex flex-col min-h-screen p-6 bg-slate-900">
         <header class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
-            <h1 class="text-2xl font-bold text-indigo-400">פאנל ניהול ⚙️</h1>
-            <div class="flex gap-2">
-                <button onclick="resetAllScores()" class="bg-red-900 text-red-100 px-3 py-1 rounded text-sm font-bold">איפוס ניקוד</button>
-                <button onclick="showScreen('login')" class="bg-slate-700 px-3 py-1 rounded text-sm">יציאה</button>
-            </div>
+            <h1 class="text-xl font-bold text-indigo-400">פאנל ניהול</h1>
+            <button onclick="showScreen('login')" class="bg-slate-700 px-3 py-1 rounded text-sm">יציאה</button>
         </header>
-        <div class="grid md:grid-cols-3 gap-6">
-            <div class="bg-slate-800 p-6 rounded-2xl border border-slate-700 h-fit">
-                <h3 class="font-bold mb-4 text-indigo-300">בקרת שלבים</h3>
-                <div id="admin-toggles" class="space-y-4"></div>
-            </div>
-            <div class="md:col-span-2 bg-slate-800 p-6 rounded-2xl border border-slate-700">
-                <h3 class="font-bold mb-4 text-indigo-300">עריכת תוכן</h3>
-                <div id="admin-questions" class="space-y-6"></div>
-            </div>
+        <div class="grid md:grid-cols-2 gap-6 overflow-y-auto">
+            <div id="admin-toggles" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-4"></div>
+            <div id="admin-questions" class="bg-slate-800 p-6 rounded-2xl border border-slate-700 space-y-4"></div>
         </div>
     </div>
 
     <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
-        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, getDocs, query, orderBy, limit } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, query, orderBy, limit, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-        // Firebase Config מהמשתמש
         const firebaseConfig = {
             apiKey: "AIzaSyC6YSQUpGpU8csuqol0ZX9uvh_GKDTol_Q",
             authDomain: "quizzinfo.firebaseapp.com",
             projectId: "quizzinfo",
             storageBucket: "quizzinfo.firebasestorage.app",
             messagingSenderId: "941264094079",
-            appId: "1:941264094079:web:d526857756987ca108504a",
-            measurementId: "G-G72Q3BKYXE"
+            appId: "1:941264094079:web:d526857756987ca108504a"
         };
 
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        // משתני מערכת
-        let user = null;
-        let myData = { name: '', score: 0, completedStages: [] };
-        let allQuestions = [];
-        let gameSettings = { stage1: true, stage2: false, stage3: false, stage4: false };
-        let currentStage = null;
-        let currentQIndex = 0;
-        let timer = 20;
-        let timerId = null;
+        let user = null, myData = { score: 0, completedStages: [] }, allQuestions = [], gameSettings = {};
+        let currentStage = null, currentQIndex = 0, timer = 20, timerId = null;
 
-        // הפעלה ראשונית
+        window.showScreen = (id) => {
+            document.querySelectorAll('body > div[id^="screen-"]').forEach(d => d.classList.add('hidden'));
+            document.getElementById(`screen-${id}`).classList.remove('hidden');
+        };
+
         async function init() {
-            signInAnonymously(auth);
+            await signInAnonymously(auth);
             onAuthStateChanged(auth, async (u) => {
                 if (u) {
                     user = u;
                     setupListeners();
-                    checkSavedUser();
+                    const saved = localStorage.getItem('quiz_name');
+                    if (saved) {
+                        const d = await getDoc(doc(db, "players", user.uid));
+                        if (d.exists()) { myData = d.data(); showScreen('lobby'); }
+                    }
                 }
             });
-        }
-
-        // בדיקת משתמש קיים
-        async function checkSavedUser() {
-            const savedName = localStorage.getItem('quiz_name');
-            if (savedName) {
-                const userDoc = await getDoc(doc(db, "players", user.uid));
-                if (userDoc.exists()) {
-                    myData = userDoc.data();
-                    updateLobbyUI();
-                    showScreen('lobby');
-                }
-            }
         }
 
         function setupListeners() {
-            // האזנה להגדרות שלבים
-            onSnapshot(doc(db, "settings", "game_state"), (snap) => {
-                if (snap.exists()) {
-                    gameSettings = snap.data();
-                    renderStages();
-                    renderAdminToggles();
-                }
+            onSnapshot(doc(db, "settings", "game_state"), (s) => {
+                if (s.exists()) { gameSettings = s.data(); renderStages(); renderAdminToggles(); }
+                else { setDoc(doc(db, "settings", "game_state"), { stage1:true, stage2:false, stage3:false, stage4:false }); }
             });
-
-            // האזנה לשאלות
-            onSnapshot(doc(db, "content", "questions"), (snap) => {
-                if (snap.exists()) {
-                    allQuestions = snap.data().list;
-                    renderAdminQuestions();
-                }
+            onSnapshot(doc(db, "content", "questions"), (s) => {
+                if (s.exists()) { allQuestions = s.data().list; renderAdminQuestions(); }
+                else { seedData(); }
             });
-
-            // האזנה לניקוד אישי (לעדכונים)
-            onSnapshot(doc(db, "players", user.uid), (snap) => {
-                if (snap.exists()) {
-                    myData = snap.data();
-                    updateLobbyUI();
-                }
-            });
+            onSnapshot(doc(db, "players", user.uid), (s) => { if (s.exists()) { myData = s.data(); updateLobbyUI(); } });
         }
 
-        // פונקציות מסכים
-        window.showScreen = (id) => {
-            document.querySelectorAll('body > div').forEach(d => d.classList.add('hidden'));
-            document.getElementById(`screen-${id}`).classList.remove('hidden');
-        };
+        async function seedData() {
+            const list = [];
+            for(let s=1; s<=4; s++) for(let q=1; q<=5; q++) 
+                list.push({ stage: s, text: `שאלה ${q} שלב ${s}`, options: ["א", "ב", "ג", "ד"], correct: 0 });
+            await setDoc(doc(db, "content", "questions"), { list });
+        }
 
         window.joinGame = async () => {
             const name = document.getElementById('player-name-input').value.trim();
-            if (!name) return alert("נא להזין שם");
+            if (!name) return;
             myData = { name, score: 0, completedStages: [] };
             await setDoc(doc(db, "players", user.uid), myData);
             localStorage.setItem('quiz_name', name);
@@ -210,62 +146,38 @@
         };
 
         function updateLobbyUI() {
-            document.getElementById('display-name').innerText = myData.name;
-            document.getElementById('display-score').innerText = myData.score;
+            document.getElementById('display-name').innerText = myData.name || '';
+            document.getElementById('display-score').innerText = myData.score || 0;
         }
 
         function renderStages() {
-            const grid = document.getElementById('stages-grid');
-            grid.innerHTML = '';
+            const grid = document.getElementById('stages-grid'); grid.innerHTML = '';
             for (let i = 1; i <= 4; i++) {
-                const isOpen = gameSettings[`stage${i}`];
-                const isDone = myData.completedStages.includes(i);
+                const isOpen = gameSettings[`stage${i}`], isDone = myData.completedStages?.includes(i);
                 const btn = document.createElement('button');
-                btn.className = `stage-card p-8 rounded-2xl border-2 transition font-bold text-xl flex flex-col items-center ${
-                    isDone ? 'bg-emerald-900/30 border-emerald-500 text-emerald-300' :
-                    isOpen ? 'bg-indigo-900/30 border-indigo-500 hover:bg-indigo-900/50' : 'bg-slate-800 border-slate-700 opacity-50 cursor-not-allowed'
-                }`;
-                btn.innerHTML = `<span>שלב ${i}</span><span class="text-sm mt-2">${isDone ? '✅ הושלם' : isOpen ? '🔓 פתוח' : '🔒 נעול'}</span>`;
-                if (isOpen && !isDone) btn.onclick = () => startStage(i);
+                btn.className = `p-6 rounded-2xl border-2 transition font-bold ${isDone ? 'bg-emerald-900/30 border-emerald-500' : isOpen ? 'bg-indigo-900/30 border-indigo-500' : 'bg-slate-800 border-slate-700 opacity-50 cursor-not-allowed'}`;
+                btn.innerHTML = `שלב ${i}<br><span class="text-xs">${isDone ? '✅ הושלם' : isOpen ? '🔓 פתוח' : '🔒 נעול'}</span>`;
+                if (isOpen && !isDone) btn.onclick = () => { currentStage = i; currentQIndex = 0; showScreen('game'); loadQuestion(); };
                 grid.appendChild(btn);
             }
         }
-
-        window.startStage = (stageNum) => {
-            currentStage = stageNum;
-            currentQIndex = 0;
-            showScreen('game');
-            loadQuestion();
-        };
 
         function loadQuestion() {
             clearInterval(timerId);
             const stageQs = allQuestions.filter(q => q.stage == currentStage);
             if (!stageQs[currentQIndex]) return finishStage();
-
             const q = stageQs[currentQIndex];
-            document.getElementById('q-progress').innerText = `שאלה ${currentQIndex + 1} מתוך ${stageQs.length}`;
+            document.getElementById('q-progress').innerText = `שאלה ${currentQIndex + 1}/5`;
             document.getElementById('question-text').innerText = q.text;
-            
-            const grid = document.getElementById('options-grid');
-            grid.innerHTML = '';
-            const colors = ['border-rose-500/40 text-rose-200', 'border-blue-500/40 text-blue-200', 'border-amber-500/40 text-amber-200', 'border-emerald-500/40 text-emerald-200'];
-            
+            const grid = document.getElementById('options-grid'); grid.innerHTML = '';
             q.options.forEach((opt, i) => {
                 const b = document.createElement('button');
-                b.className = `answer-btn p-6 rounded-2xl bg-slate-800 border-2 text-xl font-bold transition hover:bg-slate-700 ${colors[i]}`;
-                b.innerText = opt;
-                b.onclick = () => checkAnswer(i, q.correct);
+                b.className = "p-4 rounded-xl bg-slate-800 border border-slate-600 hover:bg-slate-700 font-bold transition";
+                b.innerText = opt; b.onclick = () => checkAnswer(i, q.correct);
                 grid.appendChild(b);
             });
-
-            timer = 20;
-            updateTimerUI();
-            timerId = setInterval(() => {
-                timer--;
-                updateTimerUI();
-                if (timer <= 0) checkAnswer(-1, q.correct);
-            }, 1000);
+            timer = 20; updateTimerUI();
+            timerId = setInterval(() => { timer--; updateTimerUI(); if (timer <= 0) checkAnswer(-1, q.correct); }, 1000);
         }
 
         function updateTimerUI() {
@@ -275,41 +187,22 @@
 
         async function checkAnswer(idx, correct) {
             clearInterval(timerId);
-            const isCorrect = idx === correct;
-            const feedback = document.getElementById('feedback-msg');
-            const inner = feedback.querySelector('div');
-            
-            if (isCorrect) {
-                const points = 1000 + (timer * 50);
-                myData.score += points;
-                inner.innerText = `+${points}`;
-                inner.className = "text-6xl font-black px-10 py-5 rounded-2xl shadow-2xl animate-bounce bg-emerald-600 text-white";
+            if (idx === correct) {
+                myData.score += (1000 + (timer * 50));
                 await updateDoc(doc(db, "players", user.uid), { score: myData.score });
-            } else {
-                inner.innerText = idx === -1 ? "נגמר הזמן!" : "טעות!";
-                inner.className = "text-6xl font-black px-10 py-5 rounded-2xl shadow-2xl animate-bounce bg-rose-600 text-white";
             }
-
-            feedback.classList.remove('hidden');
-            setTimeout(() => {
-                feedback.classList.add('hidden');
-                showLeaderboard();
-            }, 2000);
+            showLeaderboard();
         }
 
         async function showLeaderboard() {
-            const snap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
-            const body = document.getElementById('leaderboard-body');
-            body.innerHTML = '';
-            let i = 1;
-            snap.forEach(d => {
+            const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
+            const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
+            let rank = 1;
+            qSnap.forEach(d => {
                 const p = d.data();
-                body.innerHTML += `<tr class="${d.id === user.uid ? 'bg-indigo-900/30' : ''}">
-                    <td class="p-4 font-bold">${i === 1 ? '🥇' : i === 2 ? '🥈' : i === 3 ? '🥉' : i}</td>
-                    <td class="p-4">${p.name}</td>
-                    <td class="p-4 font-mono text-indigo-400 font-bold">${p.score}</td>
+                body.innerHTML += `<tr class="p-4 ${d.id===user.uid?'text-indigo-400':''}">
+                    <td class="p-4 font-bold">${rank++}</td><td class="p-4">${p.name}</td><td class="p-4 font-mono">${p.score}</td>
                 </tr>`;
-                i++;
             });
             showScreen('leaderboard');
         }
@@ -317,74 +210,38 @@
         window.nextStep = () => {
             currentQIndex++;
             const stageQs = allQuestions.filter(q => q.stage == currentStage);
-            if (currentQIndex < stageQs.length) loadQuestion();
-            else finishStage();
+            if (currentQIndex < stageQs.length) loadQuestion(); else finishStage();
         };
 
         async function finishStage() {
             if (!myData.completedStages.includes(currentStage)) {
                 myData.completedStages.push(currentStage);
-                await updateDoc(doc(playersPath(), user.uid), { completedStages: myData.completedStages });
+                await updateDoc(doc(db, "players", user.uid), { completedStages: myData.completedStages });
             }
-            alert("כל הכבוד! סיימת את השלב.");
             showScreen('lobby');
         }
 
-        // --- ניהול (Admin Logic) ---
-        window.loginAdmin = () => {
-            const pass = document.getElementById('admin-pass').value;
-            if (pass === "1234" || pass === "admin123") {
-                showScreen('adminDashboard');
-            } else alert("סיסמה שגויה");
-        };
+        window.loginAdmin = () => { if (document.getElementById('admin-pass').value === "1234") showScreen('adminDashboard'); };
 
         function renderAdminToggles() {
-            const cont = document.getElementById('admin-toggles');
-            cont.innerHTML = '';
+            const cont = document.getElementById('admin-toggles'); cont.innerHTML = '<h3 class="font-bold border-b border-slate-700 pb-2">פתיחת שלבים</h3>';
             for (let i = 1; i <= 4; i++) {
-                const active = gameSettings[`stage${i}`];
-                cont.innerHTML += `<div class="flex justify-between items-center p-3 bg-slate-700 rounded-xl">
-                    <span>שלב ${i}</span>
-                    <input type="checkbox" ${active ? 'checked' : ''} onchange="toggleStage(${i}, this.checked)" class="w-6 h-6 accent-indigo-500">
+                cont.innerHTML += `<div class="flex justify-between items-center bg-slate-700 p-2 rounded">
+                    <span>שלב ${i}</span><input type="checkbox" ${gameSettings[`stage${i}`]?'checked':''} onchange="toggleStage(${i}, this.checked)">
                 </div>`;
             }
         }
-
-        window.toggleStage = async (num, val) => {
-            gameSettings[`stage${num}`] = val;
-            await setDoc(doc(db, "settings", "game_state"), gameSettings);
-        };
+        window.toggleStage = async (n, v) => { gameSettings[`stage${n}`] = v; await setDoc(doc(db, "settings", "game_state"), gameSettings); };
 
         function renderAdminQuestions() {
-            const cont = document.getElementById('admin-questions');
-            cont.innerHTML = '';
-            allQuestions.forEach((q, i) => {
-                cont.innerHTML += `<div class="bg-slate-700 p-4 rounded-xl border border-slate-600">
-                    <div class="text-xs text-indigo-300 mb-1">שלב ${q.stage} | שאלה ${i+1}</div>
-                    <input value="${q.text}" onchange="updateQ(${i}, 'text', this.value)" class="w-full bg-slate-800 p-2 rounded border border-slate-600 mb-2">
-                    <div class="grid grid-cols-2 gap-2">
-                        ${q.options.map((opt, oi) => `<input value="${opt}" onchange="updateQOpt(${i}, ${oi}, this.value)" class="bg-slate-800 p-2 rounded text-sm border border-slate-600">`).join('')}
-                    </div>
+            const cont = document.getElementById('admin-questions'); cont.innerHTML = '<h3 class="font-bold border-b border-slate-700 pb-2">עריכת שאלות</h3>';
+            allQuestions.slice(0, 10).forEach((q, i) => {
+                cont.innerHTML += `<div class="text-xs bg-slate-700 p-2 rounded">
+                    <input class="w-full bg-slate-800 p-1 mb-1" value="${q.text}" onchange="updateQ(${i}, this.value)">
                 </div>`;
             });
         }
-
-        window.updateQ = async (i, field, val) => {
-            allQuestions[i][field] = val;
-            await setDoc(doc(db, "content", "questions"), { list: allQuestions });
-        };
-
-        window.updateQOpt = async (i, oi, val) => {
-            allQuestions[i].options[oi] = val;
-            await setDoc(doc(db, "content", "questions"), { list: allQuestions });
-        };
-
-        window.resetAllScores = async () => {
-            if (!confirm("לאפס תוצאות לכולם?")) return;
-            const snap = await getDocs(collection(db, "players"));
-            snap.forEach(async d => await updateDoc(doc(db, "players", d.id), { score: 0, completedStages: [] }));
-            alert("אופס בהצלחה");
-        };
+        window.updateQ = async (i, v) => { allQuestions[i].text = v; await setDoc(doc(db, "content", "questions"), { list: allQuestions }); };
 
         init();
     </script>
