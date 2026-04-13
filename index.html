@@ -455,7 +455,7 @@
                 myData.completedStages.push(currentStage);
                 await updateDoc(doc(db, "players", myData.name), { completedStages: myData.completedStages });
             }
-            window.showToast(`סיימת את שלב ${currentStage}!`, "bg-emerald-600");
+            window.showToast(`סיימת את מפגש ${currentStage}!`, "bg-emerald-600");
             window.showScreen('lobby');
         }
 
