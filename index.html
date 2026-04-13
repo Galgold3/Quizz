@@ -48,32 +48,34 @@
             <div class="absolute inset-0 rounded-full border-4 border-slate-800"></div>
             <div class="absolute inset-0 rounded-full border-4 border-indigo-500 border-t-transparent animate-spin"></div>
         </div>
-        <p class="mt-6 text-indigo-400 font-bold text-lg animate-pulse tracking-widest uppercase">טוען...</p>
+        <p class="mt-6 text-indigo-400 font-bold text-lg animate-pulse tracking-widest uppercase">טוען נתונים...</p>
     </div>
 
     <div id="screen-login" class="hidden min-h-screen flex flex-col items-center justify-center p-6 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-slate-900 via-slate-950 to-black">
         <button onclick="window.showScreen('adminLogin')" class="absolute top-6 left-6 text-slate-700 hover:text-indigo-400 transition-colors text-3xl">⚙️</button>
-        <div class="glass-panel p-10 rounded-[3rem] shadow-2xl w-full max-w-lg text-center">
+        
+        <div class="glass-panel p-12 rounded-[4rem] shadow-2xl w-full max-w-xl text-center border-indigo-500/20">
             
-            <div class="inline-flex items-center gap-4 bg-indigo-600 px-8 py-4 rounded-3xl mb-8 shadow-[0_0_30px_rgba(79,70,229,0.3)] transform -rotate-1">
-                <span class="text-3xl">💡</span>
-                <span class="text-3xl font-black text-white tracking-tight">משחק טריוויה</span>
+            <div class="inline-flex items-center gap-6 bg-indigo-600 px-10 py-6 rounded-[2.5rem] mb-10 shadow-[0_0_40px_rgba(79,70,229,0.4)]">
+                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGh0ZzY4Zzh6Znd6bmN6Znd6bmN6Znd6bmN6Znd6bmN6Znd6bmN6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/L1Eq66R1tF9XG/giphy.gif" 
+                     class="w-16 h-16 object-contain" alt="Rotating Bulb">
+                <span class="text-4xl font-black text-white tracking-tight">משחק טריוויה</span>
             </div>
 
-            <h1 class="text-3xl font-black mb-6 text-white leading-tight">יסודות ההצלחה:<br>קורס מבוא להנדסת תשתיות</h1>
+            <h1 class="text-3xl font-black mb-8 text-white leading-tight">יסודות ההצלחה:<br>קורס מבוא להנדסת תשתיות</h1>
             
-            <p class="text-indigo-300 mb-10 font-bold text-2xl leading-snug">
-                הזינו שם משתמש קבוע <br>
-                <span class="text-white bg-indigo-500/30 px-2 rounded-lg">לסנכרון ההתקדמות בין מכשירים</span>
-            </p>
+            <div class="space-y-2 mb-12">
+                <p class="text-indigo-300 font-bold text-3xl leading-snug">הזינו שם משתמש קבוע</p>
+                <p class="text-indigo-300 font-bold text-3xl leading-snug">לסנכרון ההתקדמות בין מכשירים</p>
+            </div>
             
-            <div class="relative mb-8">
+            <div class="relative mb-10">
                 <input type="text" id="player-name-input" placeholder="שם משתמש מלא" 
-                    class="w-full text-center p-6 bg-slate-900/50 border-2 border-slate-700 rounded-2xl text-white focus:border-indigo-500 outline-none transition-all font-black text-2xl placeholder:text-slate-700">
+                    class="w-full text-center p-7 bg-slate-900/50 border-2 border-slate-700 rounded-3xl text-white focus:border-indigo-500 outline-none transition-all font-black text-2xl placeholder:text-slate-700 shadow-inner">
             </div>
             
             <button onclick="window.joinGame()" 
-                class="w-full bg-indigo-600 hover:bg-indigo-500 py-6 rounded-2xl font-black text-2xl shadow-xl transition-all btn-active border-b-4 border-indigo-900">
+                class="w-full bg-indigo-600 hover:bg-indigo-500 py-7 rounded-3xl font-black text-2xl shadow-xl transition-all btn-active border-b-8 border-indigo-900 active:border-b-0">
                 התחברות וסנכרון נתונים
             </button>
         </div>
@@ -95,8 +97,8 @@
         </header>
         
         <main class="flex-1 p-8 flex flex-col items-center justify-center">
-            <h2 class="text-3xl font-black mb-12 text-slate-100">שלבי האתגר:</h2>
-            <div id="stages-grid" class="grid grid-cols-2 gap-8 w-full max-w-2xl text-center">
+            <h2 class="text-4xl font-black mb-12 text-slate-100">שלבי האתגר:</h2>
+            <div id="stages-grid" class="grid grid-cols-2 gap-8 w-full max-w-3xl text-center">
                 </div>
         </main>
     </div>
@@ -142,8 +144,7 @@
                         <th class="p-6 text-left">Score</th>
                     </tr>
                 </thead>
-                <tbody id="leaderboard-body" class="divide-y divide-slate-800/50">
-                    </tbody>
+                <tbody id="leaderboard-body" class="divide-y divide-slate-800/50"></tbody>
             </table>
         </div>
         
@@ -168,8 +169,7 @@
         <div class="flex-1 flex flex-col lg:flex-row gap-10 overflow-hidden">
             <div class="w-full lg:w-96 glass-panel p-8 rounded-[3rem] h-fit">
                 <h3 class="font-black mb-8 text-indigo-400 border-b border-slate-800 pb-4 uppercase text-xs tracking-widest">Stage Activation</h3>
-                <div id="admin-toggles" class="space-y-5">
-                    </div>
+                <div id="admin-toggles" class="space-y-5"></div>
             </div>
 
             <div class="flex-1 glass-panel p-10 rounded-[3rem] flex flex-col overflow-hidden">
@@ -177,9 +177,7 @@
                     <h3 class="font-black text-indigo-400 uppercase text-xs tracking-widest font-mono">Question Bank</h3>
                     <button onclick="window.addQuestion()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl text-sm font-black transition-all shadow-xl">+ New Question</button>
                 </div>
-                
-                <div id="admin-questions" class="flex-1 overflow-y-auto pr-4 space-y-8">
-                    </div>
+                <div id="admin-questions" class="flex-1 overflow-y-auto pr-4 space-y-8"></div>
             </div>
         </div>
     </div>
@@ -218,10 +216,7 @@
         let myData = { name: '', score: 0, completedStages: [] };
         let allQuestions = [];
         let gameSettings = { stage1: true, stage2: false, stage3: false, stage4: false };
-        let currentStage = null;
-        let currentQIndex = 0;
-        let timer = 20;
-        let timerId = null;
+        let currentStage = null, currentQIndex = 0, timer = 20, timerId = null;
 
         window.showScreen = (id) => {
             const screens = ['login', 'lobby', 'game', 'leaderboard', 'adminDashboard', 'adminLogin'];
@@ -248,7 +243,7 @@
             } else {
                 myData = { name, score: 0, completedStages: [], createdAt: Date.now() };
                 await setDoc(playerDocRef, myData);
-                window.showToast(`שלום ${name}, המערכת סונכרנה!`, "bg-emerald-600");
+                window.showToast(`נרשמת בהצלחה!`, "bg-emerald-600");
             }
             
             localStorage.setItem('quiz_user_name', name);
@@ -276,10 +271,7 @@
                         checkAutoLogin();
                     }
                 });
-            } catch (e) { 
-                console.error(e);
-                alert("שגיאה בחיבור לשרת.");
-            }
+            } catch (e) { console.error(e); }
         }
 
         async function checkAutoLogin() {
@@ -291,7 +283,7 @@
                     updateLobbyUI(); 
                     window.showScreen('lobby');
                     setupProfileListener(saved);
-                } else window.showScreen('login');
+                }
             } else window.showScreen('login');
         }
 
@@ -344,17 +336,15 @@
 
         function renderStages() {
             const grid = document.getElementById('stages-grid');
-            if (!grid) return;
-            grid.innerHTML = '';
+            if (!grid) return; grid.innerHTML = '';
             for (let i = 1; i <= 4; i++) {
-                const isOpen = gameSettings[`stage${i}`];
-                const isDone = myData.completedStages?.includes(i);
+                const isOpen = gameSettings[`stage${i}`], isDone = myData.completedStages?.includes(i);
                 const btn = document.createElement('button');
                 btn.className = `p-12 rounded-[2.5rem] border-2 font-black text-2xl transition-all shadow-xl flex flex-col items-center justify-center gap-3 ${
                     isDone ? 'bg-emerald-900/40 border-emerald-500 text-emerald-300' :
-                    isOpen ? 'bg-indigo-600/10 border-indigo-500/50 hover:bg-indigo-600/30 active:scale-95' : 'bg-slate-900 border-slate-800 opacity-50 cursor-not-allowed'
+                    isOpen ? 'bg-indigo-600/10 border-indigo-500/50 hover:bg-indigo-600/30' : 'bg-slate-900 border-slate-800 opacity-50 cursor-not-allowed'
                 }`;
-                btn.innerHTML = `מפגש ${i}<span class="text-[10px] font-black tracking-[0.2em] uppercase opacity-60">${isDone ? 'COMPLETED' : isOpen ? 'OPEN' : 'LOCKED'}</span>`;
+                btn.innerHTML = `מפגש ${i}<span class="text-[10px] uppercase opacity-60">${isDone ? 'COMPLETED' : isOpen ? 'OPEN' : 'LOCKED'}</span>`;
                 if (isOpen && !isDone) btn.onclick = () => { currentStage = i; currentQIndex = 0; window.showScreen('game'); loadQuestion(); };
                 grid.appendChild(btn);
             }
@@ -366,26 +356,23 @@
             if (!stageQs[currentQIndex]) return finishStage();
 
             const q = stageQs[currentQIndex];
-            document.getElementById('q-progress').innerText = `STAGE ${currentStage} | QUESTION ${currentQIndex + 1}/${stageQs.length}`;
+            document.getElementById('q-progress').innerText = `STAGE ${currentStage} | Q ${currentQIndex + 1}/${stageQs.length}`;
             document.getElementById('question-text').innerText = q.text;
             
-            const grid = document.getElementById('options-grid'); 
-            grid.innerHTML = '';
+            const grid = document.getElementById('options-grid'); grid.innerHTML = '';
             const colors = ['border-rose-500/30', 'border-blue-500/30', 'border-amber-500/30', 'border-emerald-500/30'];
             
             q.options.forEach((opt, i) => {
                 const b = document.createElement('button');
-                b.className = `answer-btn p-8 rounded-[2rem] bg-slate-900 border-2 font-black text-xl md:text-2xl shadow-lg ${colors[i]}`;
+                b.className = `answer-btn p-8 rounded-[2rem] bg-slate-900 border-2 font-black text-2xl shadow-lg ${colors[i]}`;
                 b.innerText = opt;
                 b.onclick = () => checkAnswer(i, q.correct);
                 grid.appendChild(b);
             });
 
-            timer = 20;
-            updateTimerUI();
+            timer = 20; updateTimerUI();
             timerId = setInterval(() => {
-                timer--;
-                updateTimerUI();
+                timer--; updateTimerUI();
                 if (timer <= 0) { clearInterval(timerId); checkAnswer(-1, q.correct); }
             }, 1000);
         }
@@ -399,43 +386,34 @@
 
         async function checkAnswer(idx, correct) {
             clearInterval(timerId);
-            const btns = document.querySelectorAll('.answer-btn');
-            btns.forEach(b => b.disabled = true);
-
             const isCorrect = idx === correct;
-            const pop = document.getElementById('feedback-pop');
-            const content = document.getElementById('feedback-content');
+            const pop = document.getElementById('feedback-pop'), content = document.getElementById('feedback-content');
             
             if (isCorrect) {
-                const bonus = 1000 + (timer * 50);
-                myData.score += bonus;
+                const bonus = 1000 + (timer * 50); myData.score += bonus;
                 content.innerText = `+${bonus}`;
                 content.className = "text-8xl font-black bg-emerald-600 px-14 py-8 rounded-[3rem] shadow-2xl animate-bounce text-white";
                 await updateDoc(doc(db, "players", myData.name), { score: myData.score });
             } else {
                 content.innerText = idx === -1 ? "TIME UP!" : "WRONG!";
-                content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] shadow-2xl animate-pulse text-white";
+                content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] animate-pulse text-white";
             }
             
             pop.classList.remove('hidden');
-            setTimeout(() => {
-                pop.classList.add('hidden');
-                showLeaderboard();
-            }, 2000);
+            setTimeout(() => { pop.classList.add('hidden'); showLeaderboard(); }, 2000);
         }
 
         async function showLeaderboard() {
             const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
-            const body = document.getElementById('leaderboard-body');
-            body.innerHTML = '';
+            const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
             let rank = 1;
             qSnap.forEach(d => {
                 const p = d.data();
                 const isMe = p.name === myData.name;
-                body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300 font-black' : ''}">
-                    <td class="p-6 text-center font-black text-2xl">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
-                    <td class="p-6 font-bold text-lg">${p.name} ${isMe ? '(אתה)' : ''}</td>
-                    <td class="p-6 text-left font-mono font-black text-2xl">${(p.score || 0).toLocaleString()}</td>
+                body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
+                    <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
+                    <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
+                    <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td>
                 </tr>`;
                 rank++;
             });
@@ -445,12 +423,8 @@
         window.nextStep = () => {
             currentQIndex++;
             const stageQs = allQuestions.filter(q => q.stage == currentStage);
-            if (currentQIndex < stageQs.length) {
-                window.showScreen('game');
-                loadQuestion();
-            } else {
-                finishStage();
-            }
+            if (currentQIndex < stageQs.length) { window.showScreen('game'); loadQuestion(); }
+            else finishStage();
         };
 
         async function finishStage() {
@@ -462,15 +436,15 @@
             window.showScreen('lobby');
         }
 
+        // --- ADMIN FUNCTIONS ---
         window.addQuestion = async () => {
-            const newQ = { id: Date.now(), stage: 1, text: "שאלה חדשה לגמרי", options: ["אופציה 1", "אופציה 2", "אופציה 3", "אופציה 4"], correct: 0 };
+            const newQ = { id: Date.now(), stage: 1, text: "שאלה חדשה", options: ["1", "2", "3", "4"], correct: 0 };
             allQuestions.push(newQ);
             await setDoc(doc(db, "content", "questions"), { list: allQuestions });
-            window.showToast("שאלה נוספה!", "bg-indigo-600");
         };
 
         window.deleteQuestion = async (id) => {
-            if(!confirm("מחיקת שאלה?")) return;
+            if(!confirm("למחוק?")) return;
             allQuestions = allQuestions.filter(q => q.id !== id);
             await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
@@ -482,38 +456,29 @@
 
         window.updateQ = async (id, field, value) => {
             const idx = allQuestions.findIndex(q => q.id === id);
-            if(idx === -1) return;
             allQuestions[idx][field] = value;
             await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
 
         window.updateQOpt = async (qId, optIdx, value) => {
             const idx = allQuestions.findIndex(q => q.id === qId);
-            if(idx === -1) return;
             allQuestions[idx].options[optIdx] = value;
             await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
 
         function renderAdminToggles() {
-            const cont = document.getElementById('admin-toggles');
-            if(!cont) return;
-            cont.innerHTML = '';
+            const cont = document.getElementById('admin-toggles'); if(!cont) return; cont.innerHTML = '';
             for (let i = 1; i <= 4; i++) {
                 const active = gameSettings[`stage${i}`];
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center p-5 bg-slate-900/50 rounded-2xl border border-slate-800";
-                div.innerHTML = `
-                    <span class="font-black text-sm uppercase">Stage ${i}</span>
-                    <input type="checkbox" ${active ? 'checked' : ''} onchange="window.updateStage(${i}, this.checked)" class="w-7 h-7 accent-indigo-500 cursor-pointer">
-                `;
+                div.innerHTML = `<span>Stage ${i}</span><input type="checkbox" ${active ? 'checked' : ''} onchange="window.updateStage(${i}, this.checked)" class="w-6 h-6 accent-indigo-500">`;
                 cont.appendChild(div);
             }
         }
 
         function renderAdminQuestions() {
-            const cont = document.getElementById('admin-questions');
-            if(!cont) return;
-            cont.innerHTML = '';
+            const cont = document.getElementById('admin-questions'); if(!cont) return; cont.innerHTML = '';
             const sorted = [...allQuestions].sort((a,b) => a.stage - b.stage);
             sorted.forEach((q) => {
                 const div = document.createElement('div');
@@ -531,7 +496,7 @@
                     <textarea class="w-full bg-black/40 p-5 rounded-2xl border border-slate-800 mb-6 font-bold" onchange="window.updateQ(${q.id}, 'text', this.value)">${q.text}</textarea>
                     <div class="grid grid-cols-2 gap-4">
                         ${q.options.map((opt, oi) => `
-                            <div class="flex items-center gap-3 bg-black/20 p-2 rounded-xl">
+                            <div class="flex items-center gap-3 bg-black/20 p-2 rounded-xl border border-slate-800/50">
                                 <input type="radio" name="correct-${q.id}" ${q.correct==oi?'checked':''} onchange="window.updateQ(${q.id}, 'correct', ${oi})">
                                 <input class="w-full bg-transparent p-2 text-sm outline-none" value="${opt}" onchange="window.updateQOpt(${q.id}, ${oi}, this.value)">
                             </div>
@@ -543,26 +508,19 @@
         }
 
         window.resetAllScores = async () => {
-            if (!confirm("אזהרה קריטית: פעולה זו תמחוק את כל השחקנים הרשומים במסד הנתונים ותנקה את טבלת המובילים. להמשיך?")) return;
-            try {
-                const snap = await getDocs(collection(db, "players"));
-                const promises = snap.docs.map(d => deleteDoc(doc(db, "players", d.id)));
-                await Promise.all(promises);
-                localStorage.removeItem('quiz_user_name');
-                window.showToast("הנתונים אופסו!", "bg-rose-600");
-                setTimeout(() => window.location.reload(), 1500);
-            } catch (e) { console.error(e); alert("שגיאה באיפוס."); }
+            if (!confirm("אזהרה: כל השחקנים והנתונים יימחקו!")) return;
+            const snap = await getDocs(collection(db, "players"));
+            await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "players", d.id))));
+            localStorage.removeItem('quiz_user_name');
+            window.showToast("הנתונים נמחקו!", "bg-rose-600");
+            setTimeout(() => window.location.reload(), 1500);
         };
 
         window.showToast = (m, c) => {
-            const t = document.getElementById('toast'); 
-            t.innerText = m; 
+            const t = document.getElementById('toast'); t.innerText = m;
             t.className = `fixed top-10 left-1/2 -translate-x-1/2 px-12 py-5 rounded-[2rem] text-white font-black shadow-2xl z-[3000] transition-all transform ${c} scale-100 opacity-100`;
-            t.classList.remove('hidden'); 
-            setTimeout(() => { 
-                t.classList.add('opacity-0', 'scale-90'); 
-                setTimeout(() => t.classList.add('hidden'), 500); 
-            }, 3000);
+            t.classList.remove('hidden');
+            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.classList.add('hidden'), 500); }, 3000);
         };
 
         init();
