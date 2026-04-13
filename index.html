@@ -37,10 +37,11 @@
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
 
-        /* 3D Pop-out effect */
-        .pop-out-icon {
-            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
-            transform: translate(15px, -15px);
+        /* 3D Pop-out Icon inside the box */
+        .pop-out-inner {
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.6));
+            margin-top: -15px;
+            margin-inline-end: 10px;
         }
     </style>
 </head>
@@ -61,25 +62,25 @@
         
         <div class="glass-panel p-12 rounded-[4rem] shadow-2xl w-full max-w-xl text-center border-indigo-500/20">
             
-            <div class="relative inline-flex items-center bg-indigo-600 px-12 py-6 rounded-[2.5rem] mb-12 shadow-[0_0_40px_rgba(79,70,229,0.4)]">
-                <span class="absolute -top-6 -right-6 text-6xl pop-out-icon">💡</span>
+            <div class="inline-flex items-center bg-indigo-600 px-10 py-6 rounded-[2.5rem] mb-12 shadow-[0_0_40px_rgba(79,70,229,0.4)] border border-indigo-400/30">
+                <span class="text-6xl pop-out-inner">💡</span>
                 <span class="text-4xl font-black text-white tracking-tight">משחק טריוויה</span>
             </div>
 
             <h1 class="text-3xl font-black mb-8 text-white leading-tight">יסודות ההצלחה:<br>קורס מבוא להנדסת תשתיות</h1>
             
-            <div class="flex flex-col gap-0 mb-12">
-                <p class="text-indigo-300 font-black text-3xl leading-none">הזינו שם משתמש קבוע</p>
-                <p class="text-indigo-300 font-black text-3xl leading-none mt-1">לסנכרון ההתקדמות בין מכשירים</p>
+            <div class="flex flex-col mb-12">
+                <p class="text-indigo-300 font-black text-3xl leading-[0.9]">הזינו שם משתמש קבוע</p>
+                <p class="text-indigo-300 font-black text-3xl leading-[0.9] mt-2">לסנכרון ההתקדמות בין מכשירים</p>
             </div>
             
             <div class="relative mb-10">
                 <input type="text" id="player-name-input" placeholder="שם משתמש מלא" 
-                    class="w-full text-center p-7 bg-slate-900/50 border-2 border-slate-700 rounded-3xl text-white focus:border-indigo-500 outline-none transition-all font-black text-2xl placeholder:text-slate-700">
+                    class="w-full text-center p-7 bg-slate-900/50 border-2 border-slate-700 rounded-3xl text-white focus:border-indigo-500 outline-none transition-all font-black text-2xl placeholder:text-slate-700 shadow-inner">
             </div>
             
             <button onclick="window.joinGame()" 
-                class="w-full bg-indigo-600 hover:bg-indigo-500 py-7 rounded-3xl font-black text-2xl shadow-xl transition-all btn-active border-b-8 border-indigo-900">
+                class="w-full bg-indigo-600 hover:bg-indigo-500 py-7 rounded-3xl font-black text-2xl shadow-xl transition-all btn-active border-b-8 border-indigo-900 active:border-b-0">
                 התחברות וסנכרון נתונים
             </button>
         </div>
@@ -115,10 +116,10 @@
                 <span class="text-slate-500 text-sm font-black uppercase">זמן:</span>
                 <div class="text-4xl font-black text-white w-14 text-center font-mono" id="timer-num">20</div>
             </div>
-            <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400 hover:bg-rose-900/40 hover:text-rose-400 transition-all">✖</button>
+            <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400">✖</button>
         </header>
         <div class="h-3 w-full bg-slate-900">
-            <div id="timer-bar" class="h-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.6)]" style="width:100%"></div>
+            <div id="timer-bar" class="h-full bg-indigo-500" style="width:100%"></div>
         </div>
         <div class="flex-1 flex items-center justify-center p-10 text-center">
             <h2 id="question-text" class="text-4xl md:text-6xl font-black leading-tight text-white drop-shadow-xl"></h2>
@@ -131,7 +132,7 @@
             <span class="text-5xl -rotate-6">🏆</span>
         </div>
         <h2 class="text-5xl font-black mb-10 text-white tracking-tight">המובילים בקורס</h2>
-        <div class="glass-panel w-full max-w-2xl rounded-[3rem] overflow-hidden border border-slate-800 shadow-2xl">
+        <div class="glass-panel w-full max-w-2xl rounded-[3rem] border border-slate-800 shadow-2xl overflow-hidden">
             <table class="w-full text-right">
                 <thead class="bg-slate-900/80 text-slate-500 uppercase text-[10px] font-black tracking-widest">
                     <tr><th class="p-6 text-center w-24">Rank</th><th class="p-6">Name</th><th class="p-6 text-left">Score</th></tr>
@@ -139,18 +140,18 @@
                 <tbody id="leaderboard-body" class="divide-y divide-slate-800/50"></tbody>
             </table>
         </div>
-        <button onclick="window.nextStep()" class="mt-12 bg-indigo-600 hover:bg-indigo-500 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl transition-all btn-active border-b-4 border-indigo-900">המשך לאתגר הבא</button>
+        <button onclick="window.nextStep()" class="mt-12 bg-indigo-600 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl btn-active border-b-4 border-indigo-900">המשך לאתגר הבא</button>
     </div>
 
     <div id="screen-adminDashboard" class="hidden min-h-screen flex flex-col p-8 bg-slate-950 overflow-hidden">
         <header class="flex justify-between items-center mb-10 border-b border-slate-800 pb-8">
             <div>
                 <h1 class="text-4xl font-black text-white">Console הניהול</h1>
-                <p class="text-indigo-500 font-bold text-sm tracking-wide uppercase">Content Management & Stage Control</p>
+                <p class="text-indigo-500 font-bold text-sm uppercase tracking-widest">Question Bank & System Control</p>
             </div>
             <div class="flex gap-4">
-                <button onclick="window.resetAllScores()" class="bg-rose-950/30 text-rose-500 border border-rose-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase hover:bg-rose-900/50 transition-all">Clear All Players & Data</button>
-                <button onclick="window.showScreen('lobby')" class="bg-slate-800 text-slate-200 px-8 py-2 rounded-2xl text-xs font-black uppercase hover:bg-slate-700 transition-all border border-slate-700">Lobby</button>
+                <button onclick="window.resetAllScores()" class="bg-rose-950/30 text-rose-500 border border-rose-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase">Clear All Players & Data</button>
+                <button onclick="window.showScreen('lobby')" class="bg-slate-800 text-slate-200 px-8 py-2 rounded-2xl text-xs font-black">Lobby</button>
             </div>
         </header>
         <div class="flex-1 flex flex-col lg:flex-row gap-10 overflow-hidden">
@@ -159,9 +160,9 @@
                 <div id="admin-toggles" class="space-y-5"></div>
             </div>
             <div class="flex-1 glass-panel p-10 rounded-[3rem] flex flex-col overflow-hidden">
-                <div class="flex justify-between items-center mb-8 shrink-0">
-                    <h3 class="font-black text-indigo-400 uppercase text-xs tracking-widest font-mono">Question Bank</h3>
-                    <button onclick="window.addQuestion()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-8 py-3 rounded-2xl text-sm font-black transition-all shadow-xl">+ New Question</button>
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="font-black text-indigo-400 uppercase text-xs tracking-widest">Question Bank</h3>
+                    <button onclick="window.addQuestion()" class="bg-indigo-600 px-8 py-3 rounded-2xl text-sm font-black">+ New Question</button>
                 </div>
                 <div id="admin-questions" class="flex-1 overflow-y-auto pr-4 space-y-8"></div>
             </div>
@@ -173,8 +174,8 @@
             <div class="text-6xl mb-8">🛡️</div>
             <h2 class="text-3xl font-black text-white mb-8">אימות מנהל</h2>
             <input type="password" id="admin-pass" placeholder="Password" class="w-full p-5 bg-black rounded-2xl mb-8 text-center border-2 border-slate-800 focus:border-indigo-500 outline-none text-2xl font-black tracking-widest">
-            <button onclick="window.loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-5 rounded-2xl font-black text-xl transition-all btn-active">LOG IN</button>
-            <button onclick="window.showScreen('login')" class="mt-6 text-slate-600 hover:text-slate-400 text-sm font-bold">CANCEL</button>
+            <button onclick="window.loginAdmin()" class="w-full bg-indigo-600 py-5 rounded-2xl font-black text-xl transition-all btn-active">LOG IN</button>
+            <button onclick="window.showScreen('login')" class="mt-6 text-slate-600 text-sm font-bold">CANCEL</button>
         </div>
     </div>
 
@@ -215,17 +216,17 @@
             if (!name) return window.showToast("נא להזין שם משתמש", "bg-rose-600");
             const playerDocRef = doc(db, "players", name);
             const playerSnap = await getDoc(playerDocRef);
-            if (playerSnap.exists()) { myData = playerSnap.data(); window.showToast(`ברוך השב, ${name}!`, "bg-indigo-600"); }
-            else { myData = { name, score: 0, completedStages: [], createdAt: Date.now() }; await setDoc(playerDocRef, myData); window.showToast(`נרשמת בהצלחה!`, "bg-emerald-600"); }
+            if (playerSnap.exists()) { myData = playerSnap.data(); }
+            else { myData = { name, score: 0, completedStages: [], createdAt: Date.now() }; await setDoc(playerDocRef, myData); }
             localStorage.setItem('quiz_user_name', name);
             updateLobbyUI(); window.showScreen('lobby');
             setupProfileListener(name);
         };
 
         window.loginAdmin = () => {
-            const p = document.getElementById('admin-pass').value;
-            if (p === "1234") { document.getElementById('admin-pass').value = ''; window.showScreen('adminDashboard'); }
-            else alert("סיסמה שגויה");
+            if (document.getElementById('admin-pass').value === "1234") { 
+                document.getElementById('admin-pass').value = ''; window.showScreen('adminDashboard'); 
+            } else alert("שגוי");
         };
 
         async function init() {
@@ -262,11 +263,7 @@
 
         async function seedInitialData() {
             const list = [];
-            for(let s=1; s<=4; s++) {
-                for(let q=1; q<=5; q++) {
-                    list.push({ id: Date.now() + Math.random(), stage: s, text: `שאלה ${q}`, options: ["1", "2", "3", "4"], correct: 0 });
-                }
-            }
+            for(let s=1; s<=4; s++) { for(let q=1; q<=5; q++) { list.push({ id: Date.now() + Math.random(), stage: s, text: `שאלה ${q}`, options: ["1", "2", "3", "4"], correct: 0 }); } }
             await setDoc(doc(db, "content", "questions"), { list });
         }
 
@@ -300,13 +297,13 @@
             const grid = document.getElementById('options-grid'); grid.innerHTML = '';
             q.options.forEach((opt, i) => {
                 const b = document.createElement('button');
-                b.className = "answer-btn p-8 rounded-[2rem] bg-slate-900 border-2 font-black text-2xl shadow-lg border-indigo-500/20";
+                b.className = "answer-btn p-8 rounded-[2rem] bg-slate-900 border-2 font-black text-2xl border-indigo-500/20";
                 b.innerText = opt;
                 b.onclick = () => checkAnswer(i, q.correct);
                 grid.appendChild(b);
             });
             timer = 20; updateTimerUI();
-            timerId = setInterval(() => { timer--; updateTimerUI(); if (timer <= 0) { clearInterval(timerId); checkAnswer(-1, q.correct); } }, 1000);
+            timerId = setInterval(() => { timer--; updateTimerUI(); if (timer <= 0) checkAnswer(-1, q.correct); }, 1000);
         }
 
         function updateTimerUI() {
@@ -321,11 +318,11 @@
             if (isCorrect) {
                 const bonus = 1000 + (timer * 50); myData.score += bonus;
                 content.innerText = `+${bonus}`;
-                content.className = "text-8xl font-black bg-emerald-600 px-14 py-8 rounded-[3rem] shadow-2xl animate-bounce text-white";
+                content.className = "text-8xl font-black bg-emerald-600 px-14 py-8 rounded-[3rem] animate-bounce text-white shadow-2xl";
                 await updateDoc(doc(db, "players", myData.name), { score: myData.score });
             } else {
                 content.innerText = idx === -1 ? "TIME UP!" : "WRONG!";
-                content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] animate-pulse text-white";
+                content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] animate-pulse text-white shadow-2xl";
             }
             pop.classList.remove('hidden');
             setTimeout(() => { pop.classList.add('hidden'); showLeaderboard(); }, 2000);
@@ -361,32 +358,25 @@
             window.showScreen('lobby');
         }
 
-        // --- ADMIN ---
+        // --- ADMIN CRUD ---
         window.addQuestion = async () => {
             const newQ = { id: Date.now(), stage: 1, text: "שאלה חדשה", options: ["1", "2", "3", "4"], correct: 0 };
             allQuestions.push(newQ); await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
-
         window.deleteQuestion = async (id) => {
             if(!confirm("למחוק?")) return;
             allQuestions = allQuestions.filter(q => q.id !== id);
             await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
-
         window.updateStage = async (n, v) => {
-            gameSettings[`stage${n}`] = v;
-            await setDoc(doc(db, "settings", "game_state"), gameSettings);
+            gameSettings[`stage${n}`] = v; await setDoc(doc(db, "settings", "game_state"), gameSettings);
         };
-
         window.updateQ = async (id, field, value) => {
-            const idx = allQuestions.findIndex(q => q.id === id);
-            allQuestions[idx][field] = value;
+            const idx = allQuestions.findIndex(q => q.id === id); allQuestions[idx][field] = value;
             await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
-
         window.updateQOpt = async (qId, optIdx, value) => {
-            const idx = allQuestions.findIndex(q => q.id === qId);
-            allQuestions[idx].options[optIdx] = value;
+            const idx = allQuestions.findIndex(q => q.id === qId); allQuestions[idx].options[optIdx] = value;
             await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
 
@@ -395,34 +385,25 @@
             for (let i = 1; i <= 4; i++) {
                 const active = gameSettings[`stage${i}`];
                 const div = document.createElement('div');
-                div.className = "flex justify-between items-center p-5 bg-slate-900/50 rounded-2xl border border-slate-800";
-                div.innerHTML = `<span>Stage ${i}</span><input type="checkbox" ${active ? 'checked' : ''} onchange="window.updateStage(${i}, this.checked)" class="w-6 h-6 accent-indigo-500">`;
+                div.className = "flex justify-between items-center p-5 bg-slate-900 rounded-xl border border-slate-800";
+                div.innerHTML = `<span>Stage ${i}</span><input type="checkbox" ${active ? 'checked' : ''} onchange="window.updateStage(${i}, this.checked)" class="w-6 h-6">`;
                 cont.appendChild(div);
             }
         }
 
         function renderAdminQuestions() {
             const cont = document.getElementById('admin-questions'); if(!cont) return; cont.innerHTML = '';
-            const sorted = [...allQuestions].sort((a,b) => a.stage - b.stage);
-            sorted.forEach((q) => {
+            allQuestions.sort((a,b) => a.stage - b.stage).forEach((q) => {
                 const div = document.createElement('div');
-                div.className = "bg-slate-900/40 p-8 rounded-[2.5rem] border border-slate-800 relative group";
+                div.className = "bg-slate-900/40 p-8 rounded-3xl border border-slate-800 relative group";
                 div.innerHTML = `
                     <button onclick="window.deleteQuestion(${q.id})" class="absolute top-6 left-6 text-rose-500 opacity-0 group-hover:opacity-100 transition-all">🗑️</button>
-                    <div class="flex items-center gap-6 mb-6">
-                        <select onchange="window.updateQ(${q.id}, 'stage', parseInt(this.value))" class="bg-indigo-600 text-white font-black text-[10px] p-2 rounded-xl">
-                            <option value="1" ${q.stage==1?'selected':''}>STAGE 1</option>
-                            <option value="2" ${q.stage==2?'selected':''}>STAGE 2</option>
-                            <option value="3" ${q.stage==3?'selected':''}>STAGE 3</option>
-                            <option value="4" ${q.stage==4?'selected':''}>STAGE 4</option>
-                        </select>
-                    </div>
-                    <textarea class="w-full bg-black/40 p-5 rounded-2xl border border-slate-800 mb-6 font-bold" onchange="window.updateQ(${q.id}, 'text', this.value)">${q.text}</textarea>
+                    <textarea class="w-full bg-black/40 p-4 rounded-xl mb-4 font-bold" onchange="window.updateQ(${q.id}, 'text', this.value)">${q.text}</textarea>
                     <div class="grid grid-cols-2 gap-4">
                         ${q.options.map((opt, oi) => `
-                            <div class="flex items-center gap-3 bg-black/20 p-2 rounded-xl border border-slate-800/50">
+                            <div class="flex items-center gap-2 bg-black/20 p-2 rounded-lg">
                                 <input type="radio" name="correct-${q.id}" ${q.correct==oi?'checked':''} onchange="window.updateQ(${q.id}, 'correct', ${oi})">
-                                <input class="w-full bg-transparent p-2 text-sm outline-none" value="${opt}" onchange="window.updateQOpt(${q.id}, ${oi}, this.value)">
+                                <input class="w-full bg-transparent text-sm" value="${opt}" onchange="window.updateQOpt(${q.id}, ${oi}, this.value)">
                             </div>
                         `).join('')}
                     </div>
@@ -432,19 +413,16 @@
         }
 
         window.resetAllScores = async () => {
-            if (!confirm("אזהרה: כל השחקנים יימחקו!")) return;
+            if (!confirm("מחיקת כל השחקנים?")) return;
             const snap = await getDocs(collection(db, "players"));
             await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "players", d.id))));
-            localStorage.removeItem('quiz_user_name');
-            window.showToast("הנתונים נמחקו!", "bg-rose-600");
-            setTimeout(() => window.location.reload(), 1500);
+            localStorage.removeItem('quiz_user_name'); window.location.reload();
         };
 
         window.showToast = (m, c) => {
             const t = document.getElementById('toast'); t.innerText = m;
-            t.className = `fixed top-10 left-1/2 -translate-x-1/2 px-12 py-5 rounded-[2rem] text-white font-black shadow-2xl z-[3000] transition-all transform ${c} scale-100 opacity-100`;
-            t.classList.remove('hidden');
-            setTimeout(() => { t.classList.add('opacity-0'); setTimeout(() => t.classList.add('hidden'), 500); }, 3000);
+            t.className = `fixed top-10 left-1/2 -translate-x-1/2 px-12 py-5 rounded-[2rem] text-white font-black shadow-2xl z-[3000] ${c} opacity-100`;
+            t.classList.remove('hidden'); setTimeout(() => t.classList.add('hidden'), 3000);
         };
 
         init();
