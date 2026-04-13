@@ -30,13 +30,18 @@
         .answer-btn { transition: all 0.2s ease; border-width: 2px; }
         .answer-btn:hover:not(:disabled) { background-color: #1e293b; border-color: #6366f1; }
         #timer-bar { transition: width 1s linear; }
-        .timer-danger { background-color: #ef4444 !important; }
         
         /* Custom UI Elements */
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.1); }
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-track { background: #0f172a; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+
+        /* 3D Pop-out effect */
+        .pop-out-icon {
+            filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+            transform: translate(15px, -15px);
+        }
     </style>
 </head>
 <body class="min-h-screen select-none overflow-y-auto">
@@ -56,26 +61,25 @@
         
         <div class="glass-panel p-12 rounded-[4rem] shadow-2xl w-full max-w-xl text-center border-indigo-500/20">
             
-            <div class="inline-flex items-center gap-6 bg-indigo-600 px-10 py-6 rounded-[2.5rem] mb-10 shadow-[0_0_40px_rgba(79,70,229,0.4)]">
-                <img src="https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNGh0ZzY4Zzh6Znd6bmN6Znd6bmN6Znd6bmN6Znd6bmN6Znd6bmN6JmVwPXYxX2ludGVybmFsX2dpZl9ieV9pZCZjdD1z/L1Eq66R1tF9XG/giphy.gif" 
-                     class="w-16 h-16 object-contain" alt="Rotating Bulb">
+            <div class="relative inline-flex items-center bg-indigo-600 px-12 py-6 rounded-[2.5rem] mb-12 shadow-[0_0_40px_rgba(79,70,229,0.4)]">
+                <span class="absolute -top-6 -right-6 text-6xl pop-out-icon">💡</span>
                 <span class="text-4xl font-black text-white tracking-tight">משחק טריוויה</span>
             </div>
 
             <h1 class="text-3xl font-black mb-8 text-white leading-tight">יסודות ההצלחה:<br>קורס מבוא להנדסת תשתיות</h1>
             
-            <div class="space-y-2 mb-12">
-                <p class="text-indigo-300 font-bold text-3xl leading-snug">הזינו שם משתמש קבוע</p>
-                <p class="text-indigo-300 font-bold text-3xl leading-snug">לסנכרון ההתקדמות בין מכשירים</p>
+            <div class="flex flex-col gap-0 mb-12">
+                <p class="text-indigo-300 font-black text-3xl leading-none">הזינו שם משתמש קבוע</p>
+                <p class="text-indigo-300 font-black text-3xl leading-none mt-1">לסנכרון ההתקדמות בין מכשירים</p>
             </div>
             
             <div class="relative mb-10">
                 <input type="text" id="player-name-input" placeholder="שם משתמש מלא" 
-                    class="w-full text-center p-7 bg-slate-900/50 border-2 border-slate-700 rounded-3xl text-white focus:border-indigo-500 outline-none transition-all font-black text-2xl placeholder:text-slate-700 shadow-inner">
+                    class="w-full text-center p-7 bg-slate-900/50 border-2 border-slate-700 rounded-3xl text-white focus:border-indigo-500 outline-none transition-all font-black text-2xl placeholder:text-slate-700">
             </div>
             
             <button onclick="window.joinGame()" 
-                class="w-full bg-indigo-600 hover:bg-indigo-500 py-7 rounded-3xl font-black text-2xl shadow-xl transition-all btn-active border-b-8 border-indigo-900 active:border-b-0">
+                class="w-full bg-indigo-600 hover:bg-indigo-500 py-7 rounded-3xl font-black text-2xl shadow-xl transition-all btn-active border-b-8 border-indigo-900">
                 התחברות וסנכרון נתונים
             </button>
         </div>
@@ -95,11 +99,9 @@
                 <span id="display-score" class="font-black text-2xl text-white leading-none">0</span>
             </div>
         </header>
-        
         <main class="flex-1 p-8 flex flex-col items-center justify-center">
             <h2 class="text-4xl font-black mb-12 text-slate-100">שלבי האתגר:</h2>
-            <div id="stages-grid" class="grid grid-cols-2 gap-8 w-full max-w-3xl text-center">
-                </div>
+            <div id="stages-grid" class="grid grid-cols-2 gap-8 w-full max-w-3xl text-center"></div>
         </main>
     </div>
 
@@ -107,7 +109,6 @@
         <div id="feedback-pop" class="hidden fixed inset-0 flex items-center justify-center z-[600] pointer-events-none">
             <div id="feedback-content" class="text-8xl font-black px-16 py-10 rounded-[4rem] shadow-2xl transform"></div>
         </div>
-
         <header class="bg-slate-900 p-5 flex justify-between items-center border-b border-slate-800">
             <div id="q-progress" class="bg-slate-800 px-5 py-2 rounded-full text-xs font-black text-indigo-400 tracking-widest uppercase">STAGE 0 | Q 0/0</div>
             <div class="flex items-center gap-4">
@@ -116,17 +117,13 @@
             </div>
             <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400 hover:bg-rose-900/40 hover:text-rose-400 transition-all">✖</button>
         </header>
-
         <div class="h-3 w-full bg-slate-900">
             <div id="timer-bar" class="h-full bg-indigo-500 shadow-[0_0_20px_rgba(99,102,241,0.6)]" style="width:100%"></div>
         </div>
-
         <div class="flex-1 flex items-center justify-center p-10 text-center">
             <h2 id="question-text" class="text-4xl md:text-6xl font-black leading-tight text-white drop-shadow-xl"></h2>
         </div>
-
-        <div id="options-grid" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto w-full mb-12">
-            </div>
+        <div id="options-grid" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto w-full mb-12"></div>
     </div>
 
     <div id="screen-leaderboard" class="hidden min-h-screen flex flex-col p-8 items-center justify-center bg-slate-950">
@@ -134,24 +131,15 @@
             <span class="text-5xl -rotate-6">🏆</span>
         </div>
         <h2 class="text-5xl font-black mb-10 text-white tracking-tight">המובילים בקורס</h2>
-        
         <div class="glass-panel w-full max-w-2xl rounded-[3rem] overflow-hidden border border-slate-800 shadow-2xl">
             <table class="w-full text-right">
                 <thead class="bg-slate-900/80 text-slate-500 uppercase text-[10px] font-black tracking-widest">
-                    <tr>
-                        <th class="p-6 text-center w-24">Rank</th>
-                        <th class="p-6">Name</th>
-                        <th class="p-6 text-left">Score</th>
-                    </tr>
+                    <tr><th class="p-6 text-center w-24">Rank</th><th class="p-6">Name</th><th class="p-6 text-left">Score</th></tr>
                 </thead>
                 <tbody id="leaderboard-body" class="divide-y divide-slate-800/50"></tbody>
             </table>
         </div>
-        
-        <button onclick="window.nextStep()" 
-            class="mt-12 bg-indigo-600 hover:bg-indigo-500 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl transition-all btn-active border-b-4 border-indigo-900">
-            המשך לאתגר הבא
-        </button>
+        <button onclick="window.nextStep()" class="mt-12 bg-indigo-600 hover:bg-indigo-500 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl transition-all btn-active border-b-4 border-indigo-900">המשך לאתגר הבא</button>
     </div>
 
     <div id="screen-adminDashboard" class="hidden min-h-screen flex flex-col p-8 bg-slate-950 overflow-hidden">
@@ -165,13 +153,11 @@
                 <button onclick="window.showScreen('lobby')" class="bg-slate-800 text-slate-200 px-8 py-2 rounded-2xl text-xs font-black uppercase hover:bg-slate-700 transition-all border border-slate-700">Lobby</button>
             </div>
         </header>
-        
         <div class="flex-1 flex flex-col lg:flex-row gap-10 overflow-hidden">
             <div class="w-full lg:w-96 glass-panel p-8 rounded-[3rem] h-fit">
                 <h3 class="font-black mb-8 text-indigo-400 border-b border-slate-800 pb-4 uppercase text-xs tracking-widest">Stage Activation</h3>
                 <div id="admin-toggles" class="space-y-5"></div>
             </div>
-
             <div class="flex-1 glass-panel p-10 rounded-[3rem] flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center mb-8 shrink-0">
                     <h3 class="font-black text-indigo-400 uppercase text-xs tracking-widest font-mono">Question Bank</h3>
@@ -186,17 +172,16 @@
         <div class="bg-slate-900 p-12 rounded-[3.5rem] border border-slate-800 w-full max-sm shadow-2xl text-center">
             <div class="text-6xl mb-8">🛡️</div>
             <h2 class="text-3xl font-black text-white mb-8">אימות מנהל</h2>
-            <input type="password" id="admin-pass" placeholder="Password" 
-                class="w-full p-5 bg-black rounded-2xl mb-8 text-center border-2 border-slate-800 focus:border-indigo-500 outline-none text-2xl font-black tracking-widest">
+            <input type="password" id="admin-pass" placeholder="Password" class="w-full p-5 bg-black rounded-2xl mb-8 text-center border-2 border-slate-800 focus:border-indigo-500 outline-none text-2xl font-black tracking-widest">
             <button onclick="window.loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-5 rounded-2xl font-black text-xl transition-all btn-active">LOG IN</button>
-            <button onclick="window.showScreen('login')" class="mt-6 text-slate-600 hover:text-slate-400 transition-colors text-sm font-bold">CANCEL</button>
+            <button onclick="window.showScreen('login')" class="mt-6 text-slate-600 hover:text-slate-400 text-sm font-bold">CANCEL</button>
         </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js";
         import { getAuth, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js";
-        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, getDocs, query, orderBy, limit, where, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
+        import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, onSnapshot, getDocs, query, orderBy, limit, deleteDoc } from "https://www.gstatic.com/firebasejs/11.0.2/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyC6YSQUpGpU8csuqol0ZX9uvh_GKDTol_Q",
@@ -212,7 +197,6 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let user;
         let myData = { name: '', score: 0, completedStages: [] };
         let allQuestions = [];
         let gameSettings = { stage1: true, stage2: false, stage3: false, stage4: false };
@@ -220,56 +204,35 @@
 
         window.showScreen = (id) => {
             const screens = ['login', 'lobby', 'game', 'leaderboard', 'adminDashboard', 'adminLogin'];
-            screens.forEach(s => {
-                const el = document.getElementById(`screen-${s}`);
-                if(el) el.classList.add('hidden');
-            });
+            screens.forEach(s => { const el = document.getElementById(`screen-${s}`); if(el) el.classList.add('hidden'); });
             const target = document.getElementById(`screen-${id}`);
             if(target) target.classList.remove('hidden');
             if(id === 'lobby') renderStages();
         };
 
         window.joinGame = async () => {
-            const input = document.getElementById('player-name-input');
-            const name = input.value.trim();
+            const name = document.getElementById('player-name-input').value.trim();
             if (!name) return window.showToast("נא להזין שם משתמש", "bg-rose-600");
-
             const playerDocRef = doc(db, "players", name);
             const playerSnap = await getDoc(playerDocRef);
-            
-            if (playerSnap.exists()) {
-                myData = playerSnap.data();
-                window.showToast(`ברוך השב, ${name}!`, "bg-indigo-600");
-            } else {
-                myData = { name, score: 0, completedStages: [], createdAt: Date.now() };
-                await setDoc(playerDocRef, myData);
-                window.showToast(`נרשמת בהצלחה!`, "bg-emerald-600");
-            }
-            
+            if (playerSnap.exists()) { myData = playerSnap.data(); window.showToast(`ברוך השב, ${name}!`, "bg-indigo-600"); }
+            else { myData = { name, score: 0, completedStages: [], createdAt: Date.now() }; await setDoc(playerDocRef, myData); window.showToast(`נרשמת בהצלחה!`, "bg-emerald-600"); }
             localStorage.setItem('quiz_user_name', name);
-            updateLobbyUI();
-            window.showScreen('lobby');
+            updateLobbyUI(); window.showScreen('lobby');
             setupProfileListener(name);
         };
 
         window.loginAdmin = () => {
             const p = document.getElementById('admin-pass').value;
-            if (p === "1234" || p === "admin123") {
-                document.getElementById('admin-pass').value = '';
-                window.showScreen('adminDashboard');
-            } else alert("סיסמה שגויה");
+            if (p === "1234") { document.getElementById('admin-pass').value = ''; window.showScreen('adminDashboard'); }
+            else alert("סיסמה שגויה");
         };
 
         async function init() {
             try {
                 await signInAnonymously(auth);
                 onAuthStateChanged(auth, async (u) => {
-                    if (u) {
-                        user = u;
-                        document.getElementById('loading-overlay').classList.add('hidden');
-                        setupListeners();
-                        checkAutoLogin();
-                    }
+                    if (u) { document.getElementById('loading-overlay').classList.add('hidden'); setupListeners(); checkAutoLogin(); }
                 });
             } catch (e) { console.error(e); }
         }
@@ -278,65 +241,42 @@
             const saved = localStorage.getItem('quiz_user_name');
             if (saved) {
                 const d = await getDoc(doc(db, "players", saved));
-                if (d.exists()) { 
-                    myData = d.data(); 
-                    updateLobbyUI(); 
-                    window.showScreen('lobby');
-                    setupProfileListener(saved);
-                }
+                if (d.exists()) { myData = d.data(); updateLobbyUI(); window.showScreen('lobby'); setupProfileListener(saved); }
             } else window.showScreen('login');
         }
 
         function setupListeners() {
             onSnapshot(doc(db, "settings", "game_state"), (snap) => {
                 gameSettings = snap.exists() ? snap.data() : { stage1: true, stage2: false, stage3: false, stage4: false };
-                renderStages();
-                renderAdminToggles();
+                renderStages(); renderAdminToggles();
             });
-
             onSnapshot(doc(db, "content", "questions"), (snap) => {
-                if (snap.exists()) { 
-                    allQuestions = snap.data().list; 
-                    renderAdminQuestions(); 
-                } else seedInitialData();
+                if (snap.exists()) { allQuestions = snap.data().list; renderAdminQuestions(); }
+                else seedInitialData();
             });
         }
 
         function setupProfileListener(name) {
-            onSnapshot(doc(db, "players", name), (snap) => {
-                if (snap.exists()) { 
-                    myData = snap.data(); 
-                    updateLobbyUI(); 
-                }
-            });
+            onSnapshot(doc(db, "players", name), (snap) => { if (snap.exists()) { myData = snap.data(); updateLobbyUI(); } });
         }
 
         async function seedInitialData() {
             const list = [];
             for(let s=1; s<=4; s++) {
                 for(let q=1; q<=5; q++) {
-                    list.push({ 
-                        id: Date.now() + Math.random(), 
-                        stage: s, 
-                        text: `שאלה ${q} לשלב ${s}`, 
-                        options: ["תשובה 1", "תשובה 2", "תשובה 3", "תשובה 4"], 
-                        correct: 0 
-                    });
+                    list.push({ id: Date.now() + Math.random(), stage: s, text: `שאלה ${q}`, options: ["1", "2", "3", "4"], correct: 0 });
                 }
             }
             await setDoc(doc(db, "content", "questions"), { list });
         }
 
         function updateLobbyUI() {
-            const nameEl = document.getElementById('display-name');
-            const scoreEl = document.getElementById('display-score');
-            if (nameEl) nameEl.innerText = myData.name || 'אורח';
-            if (scoreEl) scoreEl.innerText = (myData.score || 0).toLocaleString();
+            document.getElementById('display-name').innerText = myData.name || 'אורח';
+            document.getElementById('display-score').innerText = (myData.score || 0).toLocaleString();
         }
 
         function renderStages() {
-            const grid = document.getElementById('stages-grid');
-            if (!grid) return; grid.innerHTML = '';
+            const grid = document.getElementById('stages-grid'); if (!grid) return; grid.innerHTML = '';
             for (let i = 1; i <= 4; i++) {
                 const isOpen = gameSettings[`stage${i}`], isDone = myData.completedStages?.includes(i);
                 const btn = document.createElement('button');
@@ -354,41 +294,30 @@
             clearInterval(timerId);
             const stageQs = allQuestions.filter(q => q.stage == currentStage);
             if (!stageQs[currentQIndex]) return finishStage();
-
             const q = stageQs[currentQIndex];
             document.getElementById('q-progress').innerText = `STAGE ${currentStage} | Q ${currentQIndex + 1}/${stageQs.length}`;
             document.getElementById('question-text').innerText = q.text;
-            
             const grid = document.getElementById('options-grid'); grid.innerHTML = '';
-            const colors = ['border-rose-500/30', 'border-blue-500/30', 'border-amber-500/30', 'border-emerald-500/30'];
-            
             q.options.forEach((opt, i) => {
                 const b = document.createElement('button');
-                b.className = `answer-btn p-8 rounded-[2rem] bg-slate-900 border-2 font-black text-2xl shadow-lg ${colors[i]}`;
+                b.className = "answer-btn p-8 rounded-[2rem] bg-slate-900 border-2 font-black text-2xl shadow-lg border-indigo-500/20";
                 b.innerText = opt;
                 b.onclick = () => checkAnswer(i, q.correct);
                 grid.appendChild(b);
             });
-
             timer = 20; updateTimerUI();
-            timerId = setInterval(() => {
-                timer--; updateTimerUI();
-                if (timer <= 0) { clearInterval(timerId); checkAnswer(-1, q.correct); }
-            }, 1000);
+            timerId = setInterval(() => { timer--; updateTimerUI(); if (timer <= 0) { clearInterval(timerId); checkAnswer(-1, q.correct); } }, 1000);
         }
 
         function updateTimerUI() {
-            const bar = document.getElementById('timer-bar');
             document.getElementById('timer-num').innerText = timer;
-            bar.style.width = `${(timer / 20) * 100}%`;
-            if (timer < 6) bar.classList.add('bg-rose-600'); else bar.classList.remove('bg-rose-600');
+            document.getElementById('timer-bar').style.width = `${(timer / 20) * 100}%`;
         }
 
         async function checkAnswer(idx, correct) {
             clearInterval(timerId);
             const isCorrect = idx === correct;
             const pop = document.getElementById('feedback-pop'), content = document.getElementById('feedback-content');
-            
             if (isCorrect) {
                 const bonus = 1000 + (timer * 50); myData.score += bonus;
                 content.innerText = `+${bonus}`;
@@ -398,7 +327,6 @@
                 content.innerText = idx === -1 ? "TIME UP!" : "WRONG!";
                 content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] animate-pulse text-white";
             }
-            
             pop.classList.remove('hidden');
             setTimeout(() => { pop.classList.add('hidden'); showLeaderboard(); }, 2000);
         }
@@ -408,21 +336,18 @@
             const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
             let rank = 1;
             qSnap.forEach(d => {
-                const p = d.data();
-                const isMe = p.name === myData.name;
+                const p = d.data(); const isMe = p.name === myData.name;
                 body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
                     <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
                     <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
-                    <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td>
-                </tr>`;
+                    <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
                 rank++;
             });
             window.showScreen('leaderboard');
         }
 
         window.nextStep = () => {
-            currentQIndex++;
-            const stageQs = allQuestions.filter(q => q.stage == currentStage);
+            currentQIndex++; const stageQs = allQuestions.filter(q => q.stage == currentStage);
             if (currentQIndex < stageQs.length) { window.showScreen('game'); loadQuestion(); }
             else finishStage();
         };
@@ -436,11 +361,10 @@
             window.showScreen('lobby');
         }
 
-        // --- ADMIN FUNCTIONS ---
+        // --- ADMIN ---
         window.addQuestion = async () => {
             const newQ = { id: Date.now(), stage: 1, text: "שאלה חדשה", options: ["1", "2", "3", "4"], correct: 0 };
-            allQuestions.push(newQ);
-            await setDoc(doc(db, "content", "questions"), { list: allQuestions });
+            allQuestions.push(newQ); await setDoc(doc(db, "content", "questions"), { list: allQuestions });
         };
 
         window.deleteQuestion = async (id) => {
@@ -508,7 +432,7 @@
         }
 
         window.resetAllScores = async () => {
-            if (!confirm("אזהרה: כל השחקנים והנתונים יימחקו!")) return;
+            if (!confirm("אזהרה: כל השחקנים יימחקו!")) return;
             const snap = await getDocs(collection(db, "players"));
             await Promise.all(snap.docs.map(d => deleteDoc(doc(db, "players", d.id))));
             localStorage.removeItem('quiz_user_name');
