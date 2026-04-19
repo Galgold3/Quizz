@@ -114,7 +114,7 @@
             <div id="q-progress" class="bg-slate-800 px-5 py-2 rounded-full text-xs font-black text-indigo-400 tracking-widest uppercase">STAGE 0 | Q 0/0</div>
             <div class="flex items-center gap-4">
                 <span class="text-slate-500 text-sm font-black uppercase">זמן:</span>
-                <div class="text-4xl font-black text-white w-14 text-center font-mono" id="timer-num">20</div>
+                <div class="text-4xl font-black text-white w-14 text-center font-mono" id="timer-num">45</div>
             </div>
             <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400">✖</button>
         </header>
@@ -174,7 +174,7 @@
             <div class="text-6xl mb-8">🛡️</div>
             <h2 class="text-3xl font-black text-white mb-8">אימות מנהל</h2>
             <input type="password" id="admin-pass" placeholder="Password" class="w-full p-5 bg-black rounded-2xl mb-8 text-center border-2 border-slate-800 focus:border-indigo-500 outline-none text-2xl font-black tracking-widest">
-            <button onclick="window.loginAdmin()" class="w-full bg-indigo-600 py-5 rounded-2xl font-black text-xl transition-all btn-active">LOG IN</button>
+            <button onclick="window.loginAdmin()" class="w-full bg-indigo-600 hover:bg-indigo-500 py-5 rounded-2xl font-black text-xl transition-all btn-active">LOG IN</button>
             <button onclick="window.showScreen('login')" class="mt-6 text-slate-600 text-sm font-bold">CANCEL</button>
         </div>
     </div>
@@ -201,7 +201,7 @@
         let myData = { name: '', score: 0, completedStages: [] };
         let allQuestions = [];
         let gameSettings = { stage1: true, stage2: false, stage3: false, stage4: false };
-        let currentStage = null, currentQIndex = 0, timer = 20, timerId = null;
+        let currentStage = null, currentQIndex = 0, timer = 45, timerId = null;
 
         window.showScreen = (id) => {
             const screens = ['login', 'lobby', 'game', 'leaderboard', 'adminDashboard', 'adminLogin'];
@@ -302,13 +302,13 @@
                 b.onclick = () => checkAnswer(i, q.correct);
                 grid.appendChild(b);
             });
-            timer = 20; updateTimerUI();
+            timer = 45; updateTimerUI();
             timerId = setInterval(() => { timer--; updateTimerUI(); if (timer <= 0) checkAnswer(-1, q.correct); }, 1000);
         }
 
         function updateTimerUI() {
             document.getElementById('timer-num').innerText = timer;
-            document.getElementById('timer-bar').style.width = `${(timer / 20) * 100}%`;
+            document.getElementById('timer-bar').style.width = `${(timer / 45) * 100}%`;
         }
 
         async function checkAnswer(idx, correct) {
@@ -358,7 +358,7 @@
             window.showScreen('lobby');
         }
 
-        // --- ADMIN CRUD ---
+        // --- ADMIN ---
         window.addQuestion = async () => {
             const newQ = { id: Date.now(), stage: 1, text: "שאלה חדשה", options: ["1", "2", "3", "4"], correct: 0 };
             allQuestions.push(newQ); await setDoc(doc(db, "content", "questions"), { list: allQuestions });
