@@ -9,6 +9,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
+    <!-- Updated Tailwind CSS via CDN for development, ignoring the production warning -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -122,7 +123,7 @@
                 <span class="text-slate-500 text-sm font-black uppercase">זמן:</span>
                 <div class="text-4xl font-black text-white w-14 text-center font-mono" id="timer-num">45</div>
             </div>
-            <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400 hover:text-white transition-colors">✖</button>
+            <button onclick="window.exitGameToLobby()" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400 hover:text-white transition-colors">✖</button>
         </header>
         <div class="h-3 w-full bg-slate-900">
             <div id="timer-bar" class="h-full bg-indigo-500" style="width:100%"></div>
@@ -208,7 +209,7 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let myData = { name: '', score: 0, completedStages: [] };
+        let myData = { name: '', score: 0, completedStages: [], stageProgress: {} };
         let allQuestions = [];
         let gameSettings = { stage1: true, stage2: false };
         let currentStage = null, currentQIndex = 0, timer = 45, timerId = null;
@@ -227,7 +228,7 @@
             const playerDocRef = doc(db, "players", name);
             const playerSnap = await getDoc(playerDocRef);
             if (playerSnap.exists()) { myData = playerSnap.data(); }
-            else { myData = { name, score: 0, completedStages: [], createdAt: Date.now() }; await setDoc(playerDocRef, myData); }
+            else { myData = { name, score: 0, completedStages: [], stageProgress: {}, createdAt: Date.now() }; await setDoc(playerDocRef, myData); }
             localStorage.setItem('quiz_user_name', name);
             updateLobbyUI(); window.showScreen('lobby');
             setupProfileListener(name);
@@ -268,7 +269,7 @@
         }
 
         function setupProfileListener(name) {
-            onSnapshot(doc(db, "players", name), (snap) => { if (snap.exists()) { myData = snap.data(); updateLobbyUI(); } });
+            onSnapshot(doc(db, "players", name), (snap) => { if (snap.exists()) { myData = Object.assign(myData, snap.data()); updateLobbyUI(); } });
         }
 
         // פונקציה לכפיית שמירת השאלות המעורבבות בענן
@@ -314,13 +315,27 @@
             const grid = document.getElementById('stages-grid'); if (!grid) return; grid.innerHTML = '';
             for (let i = 1; i <= 2; i++) {
                 const isOpen = gameSettings[`stage${i}`], isDone = myData.completedStages?.includes(i);
+                
+                // Retrieve the saved progress for the stage to show a percentage, default to 0
+                const stageProgress = myData.stageProgress && myData.stageProgress[i] ? myData.stageProgress[i] : 0;
+                const stageQs = allQuestions.filter(q => q.stage == i);
+                const progressText = stageQs.length > 0 ? `(${stageProgress}/${stageQs.length})` : '';
+
                 const btn = document.createElement('button');
                 btn.className = `p-12 rounded-[2.5rem] border-2 font-black text-2xl transition-all shadow-xl flex flex-col items-center justify-center gap-3 ${
                     isDone ? 'bg-emerald-900/40 border-emerald-500 text-emerald-300' :
                     isOpen ? 'bg-indigo-600/10 border-indigo-500/50 hover:bg-indigo-600/30' : 'bg-slate-900 border-slate-800 opacity-50 cursor-not-allowed'
                 }`;
-                btn.innerHTML = `יום ${i}<span class="text-[10px] uppercase opacity-60">${isDone ? 'COMPLETED' : isOpen ? 'OPEN' : 'LOCKED'}</span>`;
-                if (isOpen && !isDone) btn.onclick = () => { currentStage = i; currentQIndex = 0; window.showScreen('game'); loadQuestion(); };
+                btn.innerHTML = `יום ${i} ${isOpen && !isDone ? progressText : ''}<span class="text-[10px] uppercase opacity-60">${isDone ? 'COMPLETED' : isOpen ? (stageProgress > 0 ? 'IN PROGRESS' : 'OPEN') : 'LOCKED'}</span>`;
+                if (isOpen && !isDone) {
+                    btn.onclick = () => { 
+                        currentStage = i; 
+                        // Start the game from the saved progress index
+                        currentQIndex = myData.stageProgress && myData.stageProgress[i] ? myData.stageProgress[i] : 0;
+                        window.showScreen('game'); 
+                        loadQuestion(); 
+                    };
+                }
                 grid.appendChild(btn);
             }
         }
@@ -354,15 +369,35 @@
             const isCorrect = idx === correct;
             const pop = document.getElementById('feedback-pop'), content = document.getElementById('feedback-content');
             
+            // Disable all answer buttons to prevent multiple clicks
+            const buttons = document.querySelectorAll('.answer-btn');
+            buttons.forEach(btn => btn.disabled = true);
+
+            // Increment the current question index
+            currentQIndex++;
+
+            if (!myData.stageProgress) {
+                myData.stageProgress = {};
+            }
+            // Save the progress for the current stage
+            myData.stageProgress[currentStage] = currentQIndex;
+
             if (isCorrect) {
                 const bonus = 1000 + (timer * 50); myData.score += bonus;
                 content.innerText = `+${bonus}`;
                 content.className = "text-8xl font-black bg-emerald-600 px-14 py-8 rounded-[3rem] animate-bounce text-white shadow-2xl";
-                await updateDoc(doc(db, "players", myData.name), { score: myData.score });
+                
             } else {
                 content.innerText = idx === -1 ? "TIME UP!" : "WRONG!";
                 content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] animate-pulse text-white shadow-2xl";
             }
+            
+            // Save the updated score and progress to Firebase
+            await updateDoc(doc(db, "players", myData.name), { 
+                score: myData.score,
+                stageProgress: myData.stageProgress
+            });
+
             pop.classList.remove('hidden');
             
             // הצגת טבלת המובילים לאחר 2 שניות של פידבק
@@ -372,6 +407,12 @@
             }, 2000);
         }
         
+        // Handles exiting the game manually via the 'X' button
+        window.exitGameToLobby = () => {
+             clearInterval(timerId);
+             window.showScreen('lobby');
+        };
+
         // פונקציה להצגת טבלת המובילים באופן עצמאי (מהלובי)
         window.showStandaloneLeaderboard = () => {
             showLeaderboard(true);
@@ -403,7 +444,8 @@
             } else {
                 // ניהול הכותרות והכפתורים בצורה חכמה בהתאם למצב במשחק
                 const stageQs = allQuestions.filter(q => q.stage == currentStage);
-                const isLastQuestion = currentQIndex >= stageQs.length - 1;
+                // currentQIndex has already been incremented in checkAnswer
+                const isLastQuestion = currentQIndex >= stageQs.length;
                 const isLastStage = currentStage === 2;
                 
                 btn.classList.remove('hidden');
@@ -429,7 +471,7 @@
         }
 
         window.nextStep = () => {
-            currentQIndex++; 
+            // currentQIndex is now incremented in checkAnswer, so we don't increment it here
             window.showScreen('game'); 
             loadQuestion();
         };
