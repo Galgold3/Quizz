@@ -67,7 +67,7 @@
                 <span class="text-4xl font-black text-white tracking-tight">משחק טריוויה</span>
             </div>
 
-            <h1 class="text-3xl font-black mb-8 text-white leading-tight">על פסי הרכבת:<br>המערכות שמניעות קדימה</h1>
+            <h1 class="text-4xl font-black mb-8 text-white leading-tight">על פסי הרכבת:<br>המערכות שמניעות קדימה</h1>
             
             <div class="flex flex-col mb-12">
                 <p class="text-indigo-300 font-black text-3xl leading-[0.9]">הזינו שם משתמש קבוע</p>
@@ -116,7 +116,7 @@
                 <span class="text-slate-500 text-sm font-black uppercase">זמן:</span>
                 <div class="text-4xl font-black text-white w-14 text-center font-mono" id="timer-num">45</div>
             </div>
-            <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400">✖</button>
+            <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400 hover:text-white transition-colors">✖</button>
         </header>
         <div class="h-3 w-full bg-slate-900">
             <div id="timer-bar" class="h-full bg-indigo-500" style="width:100%"></div>
@@ -131,16 +131,16 @@
         <div class="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-600 rounded-3xl flex items-center justify-center mb-8 shadow-2xl rotate-6">
             <span class="text-5xl -rotate-6">🏆</span>
         </div>
-        <h2 class="text-5xl font-black mb-10 text-white tracking-tight">המובילים בקורס</h2>
+        <h2 id="leaderboard-title" class="text-5xl font-black mb-10 text-white tracking-tight text-center">טבלת סיכום והמובילים</h2>
         <div class="glass-panel w-full max-w-2xl rounded-[3rem] border border-slate-800 shadow-2xl overflow-hidden">
             <table class="w-full text-right">
                 <thead class="bg-slate-900/80 text-slate-500 uppercase text-[10px] font-black tracking-widest">
-                    <tr><th class="p-6 text-center w-24">Rank</th><th class="p-6">Name</th><th class="p-6 text-left">Score</th></tr>
+                    <tr><th class="p-6 text-center w-24">מקום</th><th class="p-6">שם המשתמש</th><th class="p-6 text-left">ניקוד מצטבר</th></tr>
                 </thead>
                 <tbody id="leaderboard-body" class="divide-y divide-slate-800/50"></tbody>
             </table>
         </div>
-        <button onclick="window.nextStep()" class="mt-12 bg-indigo-600 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl btn-active border-b-4 border-indigo-900">המשך לאתגר הבא</button>
+        <button id="leaderboard-next-btn" onclick="window.nextStep()" class="mt-12 bg-indigo-600 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl btn-active border-b-4 border-indigo-900 hover:bg-indigo-500 transition-colors">השאלה הבאה</button>
     </div>
 
     <div id="screen-adminDashboard" class="hidden min-h-screen flex flex-col p-8 bg-slate-950 overflow-hidden">
@@ -150,8 +150,7 @@
                 <p class="text-indigo-500 font-bold text-sm uppercase tracking-widest">Question Bank & System Control</p>
             </div>
             <div class="flex gap-4 flex-wrap">
-                <!-- כפתור חדש לטעינת השאלות מהקוד -->
-                <button onclick="window.forceSeedQuestions()" class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase hover:bg-emerald-900/60 transition-colors">Load New Questions</button>
+                <button onclick="window.forceSeedQuestions()" class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase hover:bg-emerald-900/60 transition-colors">Load New Questions (DANGER)</button>
                 <button onclick="window.resetAllScores()" class="bg-rose-950/30 text-rose-500 border border-rose-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase hover:bg-rose-900/50 transition-colors">Clear All Players</button>
                 <button onclick="window.showScreen('lobby')" class="bg-slate-800 text-slate-200 px-8 py-2 rounded-2xl text-xs font-black hover:bg-slate-700 transition-colors">Lobby</button>
             </div>
@@ -202,7 +201,6 @@
 
         let myData = { name: '', score: 0, completedStages: [] };
         let allQuestions = [];
-        // Updated to only 2 days instead of 4 stages
         let gameSettings = { stage1: true, stage2: false };
         let currentStage = null, currentQIndex = 0, timer = 45, timerId = null;
 
@@ -264,7 +262,7 @@
             onSnapshot(doc(db, "players", name), (snap) => { if (snap.exists()) { myData = snap.data(); updateLobbyUI(); } });
         }
 
-        // --- NEW FUNCTION: Force overwrite questions to Firebase ---
+        // פונקציה לכפיית שמירת השאלות המעורבבות בענן
         window.forceSeedQuestions = async () => {
             if (!confirm("פעולה זו תדרוס את בנק השאלות הקיים בענן ותטען מחדש את השאלות המעודכנות מהקוד. להמשיך?")) return;
             await seedInitialData();
@@ -272,28 +270,27 @@
         };
 
         async function seedInitialData() {
-            // New questions database, split into Day 1 (stage 1) and Day 2 (stage 2)
             const list = [
-                // יום ראשון
-                { id: 101, stage: 1, text: "מהו התפקיד העיקרי של מערכת ATP במערכת CBTC?", options: ["ניהול לוחות זמנים ותפעול הרכבות", "תקשורת בין הנהג למרכז הבקרה", "מניעת התנגשויות, מהירות מופרזת ומצבים מסוכנים", "פתיחה וסגירה אוטומטית של דלתות"], correct: 2 },
-                { id: 102, stage: 1, text: "איזה רכיב במערכת CBTC מספק לרכבת מידע מיקום מדויק כאשר היא חולפת מעליו?", options: ["Zone Controller", "Way-side Antenna", "Beacon", "ATS"], correct: 2 },
-                { id: 103, stage: 1, text: "מה היתרון המרכזי של מערכת 'בלוק נע' (Moving Block) לעומת 'בלוק קבוע' (Fixed Block)?", options: ["שימוש בפחות תקשורת", "ביטול הצורך בבקרת רכבות", "הקטנת המרווח בין רכבות והגדלת קיבולת הקו", "הפעלת רכבות ללא אספקת חשמל"], correct: 2 },
+                // יום ראשון - התשובות עורבבו כדי שלא יפלו תמיד על 2 (ג')
+                { id: 101, stage: 1, text: "מהו התפקיד העיקרי של מערכת ATP במערכת CBTC?", options: ["מניעת התנגשויות, מהירות מופרזת ומצבים מסוכנים", "ניהול לוחות זמנים ותפעול הרכבות", "תקשורת בין הנהג למרכז הבקרה", "פתיחה וסגירה אוטומטית של דלתות"], correct: 0 },
+                { id: 102, stage: 1, text: "איזה רכיב במערכת CBTC מספק לרכבת מידע מיקום מדויק כאשר היא חולפת מעליו?", options: ["Zone Controller", "Beacon", "ATS", "Way-side Antenna"], correct: 3 },
+                { id: 103, stage: 1, text: "מה היתרון המרכזי של מערכת 'בלוק נע' (Moving Block) לעומת 'בלוק קבוע' (Fixed Block)?", options: ["שימוש בפחות תקשורת", "הקטנת המרווח בין רכבות והגדלת קיבולת הקו", "ביטול הצורך בבקרת רכבות", "הפעלת רכבות ללא אספקת חשמל"], correct: 1 },
                 { id: 104, stage: 1, text: "כמה רשתות תקשורת (CBN) נפרדות קיימות?", options: ["3", "4", "5", "6"], correct: 1 },
-                { id: 105, stage: 1, text: "מה הן ראשי התיבות של WWRS?", options: ["Wireless Worldwide Resource Solutions", "Wireless Wideband Radio System", "Wideband Wireless Radio System", "World Wide Radio System"], correct: 2 },
-                { id: 106, stage: 1, text: "איזו מערכת משותפת לאגף כספים, שירות, תפעול, ומערכות?", options: ["TAHPS", "AFC", "PAS", "URS"], correct: 1 },
+                { id: 105, stage: 1, text: "מה הן ראשי התיבות של WWRS?", options: ["Wideband Wireless Radio System", "Wireless Worldwide Resource Solutions", "Wireless Wideband Radio System", "World Wide Radio System"], correct: 0 },
+                { id: 106, stage: 1, text: "איזו מערכת משותפת לאגף כספים, שירות, תפעול, ומערכות?", options: ["TAHPS", "PAS", "AFC", "URS"], correct: 2 },
                 { id: 107, stage: 1, text: "מהו תפקידו העיקרי של השנאי בתחנת ההשנאה?", options: ["להמיר זרם ישר לזרם חילופין", "להוריד את רמת המתח לרמה הנדרשת", "להפעיל את הגנרטורים", "לספק תאורת חירום בלבד"], correct: 1 },
-                { id: 108, stage: 1, text: "מהו תפקידו של תיל המגע (C.W) ברשת החשמול?", options: ["להחזיק את הרשת ולספוג את הכפף", "למנוע כפף בתיל המגע", "להעביר את האנרגיה לנייד החשמלי באמצעות מגע עם הפנטוגרף", "לתמוך בתורן החשמול"], correct: 2 },
-                { id: 109, stage: 1, text: "איזה אמצעי גיבוי מספק חשמל באופן מיידי ('בזמן אפס') עד להפעלת הגנרטורים?", options: ["תחנת השנאה", "מערכת OCS", "מצברים ו-UPS", "תיל המגע"], correct: 2 },
+                { id: 108, stage: 1, text: "מהו תפקידו של תיל המגע (C.W) ברשת החשמול?", options: ["להעביר את האנרגיה לנייד החשמלי באמצעות מגע עם הפנטוגרף", "להחזיק את הרשת ולספוג את הכפף", "למנוע כפף בתיל המגע", "לתמוך בתורן החשמול"], correct: 0 },
+                { id: 109, stage: 1, text: "איזה אמצעי גיבוי מספק חשמל באופן מיידי ('בזמן אפס') עד להפעלת הגנרטורים?", options: ["תחנת השנאה", "מערכת OCS", "תיל המגע", "מצברים ו-UPS"], correct: 3 },
 
                 // יום שני
-                { id: 201, stage: 2, text: "מהו תפקיד הפנטוגרף ברכבת הקלה?", options: ["לחבר בין הקרונות", "להעביר את החשמל מהרשת העילית אל הרכבת", "לשלוט במערכת הבלימה", "לווסת את מערכת המיזוג"], correct: 1 },
-                { id: 202, stage: 2, text: "באיזו רמת GoA מתוכנן לפעול פרויקט המטרו?", options: ["GoA1 – שליטה מלאה של נהג", "GoA2 – שליטה חלקית של נהג", "GoA3 – ניהוג אוטומטי עם נהג", "GoA4 – ניהוג ושליטה אוטומטיים ללא נהג"], correct: 3 },
+                { id: 201, stage: 2, text: "מהו תפקיד הפנטוגרף ברכבת הקלה?", options: ["להעביר את החשמל מהרשת העילית אל הרכבת", "לחבר בין הקרונות", "לשלוט במערכת הבלימה", "לווסת את מערכת המיזוג"], correct: 0 },
+                { id: 202, stage: 2, text: "באיזו רמת GoA מתוכנן לפעול פרויקט המטרו?", options: ["GoA1 – שליטה מלאה של נהג", "GoA4 – ניהוג ושליטה אוטומטיים ללא נהג", "GoA2 – שליטה חלקית של נהג", "GoA3 – ניהוג אוטומטי עם נהג"], correct: 1 },
                 { id: 203, stage: 2, text: "כמה סוגי בלמים קיימים ברכבת הקלה?", options: ["סוג אחד", "שני סוגים", "שלושה סוגים", "ארבעה סוגים"], correct: 2 },
-                { id: 204, stage: 2, text: "מהם נתוני הבסיס המרכזיים הנדרשים לתכנון תוואי אופקי של מסילה?", options: ["מהירות תכן, הנחיות מסילתיות, סכמה תפעולית וגבולות סטטוטוריים", "סוג הקרון, צבע המסילה, מספר התחנות וגובה הרציף", "סוג האיתות, מערכת הכריזה, מספר הנהגים ותדירות התחזוקה", "סוג האדנים, עובי פלטת הבטון, מערכת הניקוז וסוג הריצוף"], correct: 0 },
-                { id: 205, stage: 2, text: "מה ההבדל המרכזי בין Slab Track לבין Ballasted Track?", options: ["Slab Track משמשת רק במנהרות, בעוד Ballasted Track משמשת רק בתוואי עילי", "Slab Track מיועדת רק לרכבת קלה, בעוד Ballasted Track מיועדת רק למטרו", "אין הבדל במבנה שלהן; ההבדל הוא רק בעלויות התחזוקה", "Slab Track מבוססת על פלטת בטון, בעוד Ballasted Track מבוססת על רבד חצץ"], correct: 3 },
-                { id: 206, stage: 2, text: "מהם התפקידים המרכזיים של אביזרי החיבור (Fasteners) במבנה המסילה?", options: ["להוביל את מי הניקוז מהמסילה אל מערכת הביוב", "לאפשר לרכבת לשנות מסילה ללא שימוש במפלגים", "לקבע את הפסים, לשמור על גיאומטריית המסילה, להעביר עומסים, להפחית רעידות ולספק בידוד חשמלי", "להגן על המסילה מפני פגיעות של כלי רכב בצמתים בלבד"], correct: 2 },
-                { id: 207, stage: 2, text: "מי היה נורברט ווינר?", options: ["ממציא ה-firewall הראשון", "הוגה מדע הבקרה והתקשורת בין יצור חי למכונה", "שותף של ביל גייטס בייסוד מיקרוסופט", "מייסד WhatsApp"], correct: 1 },
-                { id: 208, stage: 2, text: "מה מחייבת רגולציית הסייבר על נת\"ע?", options: ["דיווח על כל ניסיון או תקיפת סייבר על המערכות", "הגנה טוטאלית על מערכות הרכבות", "ביצוע פעולות לאבטחת מערכות ממוחשבות ושמירה על המידע", "אין רגולציית סייבר בישראל"], correct: 2 },
+                { id: 204, stage: 2, text: "מהם נתוני הבסיס המרכזיים הנדרשים לתכנון תוואי אופקי של מסילה?", options: ["סוג הקרון, צבע המסילה, מספר התחנות וגובה הרציף", "סוג האיתות, מערכת הכריזה, מספר הנהגים ותדירות התחזוקה", "סוג האדנים, עובי פלטת הבטון, מערכת הניקוז וסוג הריצוף", "מהירות תכן, הנחיות מסילתיות, סכמה תפעולית וגבולות סטטוטוריים"], correct: 3 },
+                { id: 205, stage: 2, text: "מה ההבדל המרכזי בין Slab Track לבין Ballasted Track?", options: ["Slab Track מבוססת על פלטת בטון, בעוד Ballasted Track מבוססת על רבד חצץ", "Slab Track משמשת רק במנהרות, בעוד Ballasted Track משמשת רק בתוואי עילי", "Slab Track מיועדת רק לרכבת קלה, בעוד Ballasted Track מיועדת רק למטרו", "אין הבדל במבנה שלהן; ההבדל הוא רק בעלויות התחזוקה"], correct: 0 },
+                { id: 206, stage: 2, text: "מהם התפקידים המרכזיים של אביזרי החיבור (Fasteners) במבנה המסילה?", options: ["להוביל את מי הניקוז מהמסילה אל מערכת הביוב", "לקבע את הפסים, לשמור על גיאומטריית המסילה, להעביר עומסים, להפחית רעידות ולספק בידוד חשמלי", "לאפשר לרכבת לשנות מסילה ללא שימוש במפלגים", "להגן על המסילה מפני פגיעות של כלי רכב בצמתים בלבד"], correct: 1 },
+                { id: 207, stage: 2, text: "מי היה נורברט ווינר?", options: ["ממציא ה-firewall הראשון", "שותף של ביל גייטס בייסוד מיקרוסופט", "הוגה מדע הבקרה והתקשורת בין יצור חי למכונה", "מייסד WhatsApp"], correct: 2 },
+                { id: 208, stage: 2, text: "מה מחייבת רגולציית הסייבר על נת\"ע?", options: ["ביצוע פעולות לאבטחת מערכות ממוחשבות ושמירה על המידע", "דיווח על כל ניסיון או תקיפת סייבר על המערכות", "הגנה טוטאלית על מערכות הרכבות", "אין רגולציית סייבר בישראל"], correct: 0 },
                 { id: 209, stage: 2, text: "מהם האיומים העיקריים בסייבר?", options: ["מפגע פנימי, תוקף חיצוני, טכנולוגיות חדשות, שרשרת אספקה", "גורמים משפטיים, האקרים, פשיעת סייבר", "Zero day, חולשות ידועות, וירוסים, כופרות", "כל התשובות נכונות"], correct: 3 }
             ];
             await setDoc(doc(db, "content", "questions"), { list });
@@ -306,7 +303,6 @@
 
         function renderStages() {
             const grid = document.getElementById('stages-grid'); if (!grid) return; grid.innerHTML = '';
-            // Changed to 2 days instead of 4 stages
             for (let i = 1; i <= 2; i++) {
                 const isOpen = gameSettings[`stage${i}`], isDone = myData.completedStages?.includes(i);
                 const btn = document.createElement('button');
@@ -348,6 +344,7 @@
             clearInterval(timerId);
             const isCorrect = idx === correct;
             const pop = document.getElementById('feedback-pop'), content = document.getElementById('feedback-content');
+            
             if (isCorrect) {
                 const bonus = 1000 + (timer * 50); myData.score += bonus;
                 content.innerText = `+${bonus}`;
@@ -358,7 +355,12 @@
                 content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] animate-pulse text-white shadow-2xl";
             }
             pop.classList.remove('hidden');
-            setTimeout(() => { pop.classList.add('hidden'); showLeaderboard(); }, 2000);
+            
+            // הצגת טבלת המובילים לאחר 2 שניות של פידבק
+            setTimeout(() => { 
+                pop.classList.add('hidden'); 
+                showLeaderboard(); 
+            }, 2000);
         }
 
         async function showLeaderboard() {
@@ -373,13 +375,37 @@
                     <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
                 rank++;
             });
+
+            // ניהול הכותרות והכפתורים בצורה חכמה בהתאם למצב במשחק
+            const title = document.getElementById('leaderboard-title');
+            const btn = document.getElementById('leaderboard-next-btn');
+            const stageQs = allQuestions.filter(q => q.stage == currentStage);
+            
+            const isLastQuestion = currentQIndex >= stageQs.length - 1;
+            const isLastStage = currentStage === 2;
+
+            if (!isLastQuestion) {
+                title.innerText = "טבלת מובילים זמנית";
+                btn.innerText = "המשך לשאלה הבאה";
+                btn.onclick = window.nextStep;
+            } else if (isLastQuestion && !isLastStage) {
+                title.innerText = "סיכום יום " + currentStage;
+                btn.innerText = "סיום המפגש וחזרה ללובי";
+                btn.onclick = window.finishStage;
+            } else {
+                // נגמר המשחק (יום אחרון, שאלה אחרונה)
+                title.innerText = "🏆 סיום המשחק - המנצחים! 🏆";
+                btn.innerText = "סיום המשחק";
+                btn.onclick = window.finishStage;
+            }
+
             window.showScreen('leaderboard');
         }
 
         window.nextStep = () => {
-            currentQIndex++; const stageQs = allQuestions.filter(q => q.stage == currentStage);
-            if (currentQIndex < stageQs.length) { window.showScreen('game'); loadQuestion(); }
-            else finishStage();
+            currentQIndex++; 
+            window.showScreen('game'); 
+            loadQuestion();
         };
 
         async function finishStage() {
@@ -415,7 +441,6 @@
 
         function renderAdminToggles() {
             const cont = document.getElementById('admin-toggles'); if(!cont) return; cont.innerHTML = '';
-            // Changed to loop only up to 2 days
             for (let i = 1; i <= 2; i++) {
                 const active = gameSettings[`stage${i}`];
                 const div = document.createElement('div');
