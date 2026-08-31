@@ -242,18 +242,42 @@
 
         async function init() {
             try {
+                // Show loading screen immediately
+                document.getElementById('loading-overlay').classList.remove('hidden');
+                
                 await signInAnonymously(auth);
                 onAuthStateChanged(auth, async (u) => {
-                    if (u) { document.getElementById('loading-overlay').classList.add('hidden'); setupListeners(); checkAutoLogin(); }
+                    if (u) { 
+                        document.getElementById('loading-overlay').classList.add('hidden'); 
+                        setupListeners(); 
+                        checkAutoLogin(); 
+                    }
                 });
-            } catch (e) { console.error(e); }
+            } catch (e) { 
+                console.error("Firebase Auth Error:", e);
+                // Hide loading overlay and show error toast if Firebase init fails (e.g. blocked by AdBlocker/Firewall)
+                document.getElementById('loading-overlay').classList.add('hidden');
+                document.getElementById('toast').innerText = "שגיאת תקשורת. ייתכן שחוסם פרסומות מופעל או שיש חסימת רשת.";
+                document.getElementById('toast').className = "fixed top-10 left-1/2 -translate-x-1/2 px-12 py-5 rounded-[2rem] text-white font-black shadow-2xl z-[3000] bg-rose-600 opacity-100";
+                document.getElementById('toast').classList.remove('hidden');
+                setTimeout(() => document.getElementById('toast').classList.add('hidden'), 5000);
+                
+                // Fallback: Show login screen so the user isn't stuck on a blank screen
+                window.showScreen('login');
+            }
         }
 
         async function checkAutoLogin() {
             const saved = localStorage.getItem('quiz_user_name');
             if (saved) {
-                const d = await getDoc(doc(db, "players", saved));
-                if (d.exists()) { myData = d.data(); updateLobbyUI(); window.showScreen('lobby'); setupProfileListener(saved); }
+                try {
+                    const d = await getDoc(doc(db, "players", saved));
+                    if (d.exists()) { myData = d.data(); updateLobbyUI(); window.showScreen('lobby'); setupProfileListener(saved); }
+                    else { window.showScreen('login'); }
+                } catch(e) {
+                     console.error("Error auto-login:", e);
+                     window.showScreen('login');
+                }
             } else window.showScreen('login');
         }
 
@@ -393,10 +417,12 @@
             }
             
             // Save the updated score and progress to Firebase
-            await updateDoc(doc(db, "players", myData.name), { 
-                score: myData.score,
-                stageProgress: myData.stageProgress
-            });
+            try {
+                await updateDoc(doc(db, "players", myData.name), { 
+                    score: myData.score,
+                    stageProgress: myData.stageProgress
+                });
+            } catch(e) { console.error("Error saving score:", e); }
 
             pop.classList.remove('hidden');
             
@@ -420,17 +446,22 @@
 
         // הוספנו פרמטר isStandalone כדי להבדיל בין צפייה יזומה מהלובי לבין מעבר טבעי במשחק
         async function showLeaderboard(isStandalone = false) {
-            const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
-            const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
-            let rank = 1;
-            qSnap.forEach(d => {
-                const p = d.data(); const isMe = p.name === myData.name;
-                body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
-                    <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
-                    <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
-                    <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
-                rank++;
-            });
+            try {
+                const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
+                const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
+                let rank = 1;
+                qSnap.forEach(d => {
+                    const p = d.data(); const isMe = p.name === myData.name;
+                    body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
+                        <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
+                        <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
+                        <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
+                    rank++;
+                });
+            } catch (e) {
+                console.error("Error fetching leaderboard:", e);
+                document.getElementById('leaderboard-body').innerHTML = '<tr><td colspan="3" class="p-6 text-center">שגיאה בטעינת הנתונים</td></tr>';
+            }
 
             const title = document.getElementById('leaderboard-title');
             const btn = document.getElementById('leaderboard-next-btn');
@@ -480,7 +511,9 @@
         window.finishStage = async () => {
             if (!myData.completedStages.includes(currentStage)) {
                 myData.completedStages.push(currentStage);
-                await updateDoc(doc(db, "players", myData.name), { completedStages: myData.completedStages });
+                try {
+                    await updateDoc(doc(db, "players", myData.name), { completedStages: myData.completedStages });
+                } catch(e) { console.error("Error updating completed stages:", e); }
             }
             window.showToast(`סיימת את יום ${currentStage}!`, "bg-emerald-600");
             window.showScreen('lobby');
