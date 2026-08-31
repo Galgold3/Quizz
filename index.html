@@ -471,23 +471,6 @@
 
         // הוספנו פרמטר isStandalone כדי להבדיל בין צפייה יזומה מהלובי לבין מעבר טבעי במשחק
         async function showLeaderboard(isStandalone = false) {
-            try {
-                const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
-                const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
-                let rank = 1;
-                qSnap.forEach(d => {
-                    const p = d.data(); const isMe = p.name === myData.name;
-                    body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
-                        <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
-                        <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
-                        <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
-                    rank++;
-                });
-            } catch (e) {
-                console.error("Error fetching leaderboard:", e);
-                document.getElementById('leaderboard-body').innerHTML = '<tr><td colspan="3" class="p-6 text-center">שגיאה בטעינת הנתונים</td></tr>';
-            }
-
             const title = document.getElementById('leaderboard-title');
             const btn = document.getElementById('leaderboard-next-btn');
             const closeBtn = document.getElementById('close-leaderboard-btn');
@@ -523,7 +506,31 @@
                 }
             }
 
+            // מציגים טקסט טעינה בזמן שהנתונים נמשכים מהרשת, ומעבירים מסך *מיד* כדי למנוע קפיצות במסך
+            document.getElementById('leaderboard-body').innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-500 animate-pulse font-bold">טוען נתונים...</td></tr>';
             window.showScreen('leaderboard');
+
+            try {
+                const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
+                const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
+                let rank = 1;
+                qSnap.forEach(d => {
+                    const p = d.data(); const isMe = p.name === myData.name;
+                    body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
+                        <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
+                        <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
+                        <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
+                    rank++;
+                });
+                
+                // If there are no players yet
+                if (rank === 1) {
+                     body.innerHTML = '<tr><td colspan="3" class="p-6 text-center text-slate-500">אין נתונים להצגה</td></tr>';
+                }
+            } catch (e) {
+                console.error("Error fetching leaderboard:", e);
+                document.getElementById('leaderboard-body').innerHTML = '<tr><td colspan="3" class="p-6 text-center text-rose-500 font-bold">שגיאה בטעינת הנתונים</td></tr>';
+            }
         }
 
         window.nextStep = () => {
