@@ -89,8 +89,9 @@
     <div id="screen-lobby" class="hidden min-h-screen flex flex-col">
         <header class="bg-slate-900/50 backdrop-blur-md p-5 border-b border-slate-800 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center gap-5">
-                <button onclick="window.showScreen('adminLogin')" class="text-slate-500 hover:text-indigo-400 transition-colors text-2xl">⚙️</button>
-                <div class="flex flex-col">
+                <button onclick="window.showScreen('adminLogin')" class="text-slate-500 hover:text-indigo-400 transition-colors text-2xl" title="לוח בקרה למנהלים">⚙️</button>
+                <button onclick="window.showStandaloneLeaderboard()" class="text-amber-400 hover:text-amber-300 transition-colors text-2xl drop-shadow-md" title="צפייה בטבלת המובילים">🏆</button>
+                <div class="flex flex-col border-r-2 border-slate-700 pr-5">
                     <span class="text-slate-500 text-[10px] uppercase font-bold tracking-tighter">משתמש מחובר</span>
                     <span id="display-name" class="text-white font-black text-lg">---</span>
                 </div>
@@ -100,9 +101,14 @@
                 <span id="display-score" class="font-black text-2xl text-white leading-none">0</span>
             </div>
         </header>
-        <main class="flex-1 p-8 flex flex-col items-center justify-center">
+        <main class="flex-1 p-8 flex flex-col items-center justify-center relative">
+            
             <h2 class="text-4xl font-black mb-12 text-slate-100">שלבי האתגר:</h2>
-            <div id="stages-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl text-center"></div>
+            <div id="stages-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl text-center mb-8"></div>
+            
+            <button onclick="window.showStandaloneLeaderboard()" class="mt-8 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-8 py-4 rounded-3xl font-black text-xl transition-all shadow-lg flex items-center gap-3 btn-active">
+                <span>🏆</span> טבלת המובילים המלאה
+            </button>
         </main>
     </div>
 
@@ -127,8 +133,11 @@
         <div id="options-grid" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto w-full mb-12"></div>
     </div>
 
-    <div id="screen-leaderboard" class="hidden min-h-screen flex flex-col p-8 items-center justify-center bg-slate-950">
-        <div class="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-600 rounded-3xl flex items-center justify-center mb-8 shadow-2xl rotate-6">
+    <div id="screen-leaderboard" class="hidden min-h-screen flex flex-col p-8 items-center justify-center bg-slate-950 relative">
+        <!-- Close button for standalone mode -->
+        <button id="close-leaderboard-btn" onclick="window.showScreen('lobby')" class="hidden absolute top-8 left-8 w-14 h-14 flex items-center justify-center bg-slate-900 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 transition-all text-2xl z-50 shadow-xl btn-active">✖</button>
+        
+        <div class="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-600 rounded-3xl flex items-center justify-center mb-8 shadow-2xl rotate-6 mt-10">
             <span class="text-5xl -rotate-6">🏆</span>
         </div>
         <h2 id="leaderboard-title" class="text-5xl font-black mb-10 text-white tracking-tight text-center">טבלת מובילים</h2>
@@ -359,11 +368,17 @@
             // הצגת טבלת המובילים לאחר 2 שניות של פידבק
             setTimeout(() => { 
                 pop.classList.add('hidden'); 
-                showLeaderboard(); 
+                showLeaderboard(false); 
             }, 2000);
         }
+        
+        // פונקציה להצגת טבלת המובילים באופן עצמאי (מהלובי)
+        window.showStandaloneLeaderboard = () => {
+            showLeaderboard(true);
+        };
 
-        async function showLeaderboard() {
+        // הוספנו פרמטר isStandalone כדי להבדיל בין צפייה יזומה מהלובי לבין מעבר טבעי במשחק
+        async function showLeaderboard(isStandalone = false) {
             const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
             const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
             let rank = 1;
@@ -376,27 +391,38 @@
                 rank++;
             });
 
-            // ניהול הכותרות והכפתורים בצורה חכמה בהתאם למצב במשחק
             const title = document.getElementById('leaderboard-title');
             const btn = document.getElementById('leaderboard-next-btn');
-            const stageQs = allQuestions.filter(q => q.stage == currentStage);
+            const closeBtn = document.getElementById('close-leaderboard-btn');
             
-            const isLastQuestion = currentQIndex >= stageQs.length - 1;
-            const isLastStage = currentStage === 2;
-
-            if (!isLastQuestion) {
+            // אם נכנסנו לטבלה בצורה יזומה מהלובי
+            if (isStandalone) {
                 title.innerText = "טבלת מובילים";
-                btn.innerText = "המשך לשאלה הבאה";
-                btn.onclick = window.nextStep;
-            } else if (isLastQuestion && !isLastStage) {
-                title.innerText = "סיכום יום " + currentStage;
-                btn.innerText = "סיום המפגש וחזרה ללובי";
-                btn.onclick = window.finishStage;
+                btn.classList.add('hidden'); // מסתירים את כפתור ההמשך
+                closeBtn.classList.remove('hidden'); // מציגים כפתור יציאה (X)
             } else {
-                // נגמר המשחק (יום אחרון, שאלה אחרונה)
-                title.innerText = "🏆 סיום המשחק - המנצחים! 🏆";
-                btn.innerText = "סיום המשחק";
-                btn.onclick = window.finishStage;
+                // ניהול הכותרות והכפתורים בצורה חכמה בהתאם למצב במשחק
+                const stageQs = allQuestions.filter(q => q.stage == currentStage);
+                const isLastQuestion = currentQIndex >= stageQs.length - 1;
+                const isLastStage = currentStage === 2;
+                
+                btn.classList.remove('hidden');
+                closeBtn.classList.add('hidden');
+
+                if (!isLastQuestion) {
+                    title.innerText = "טבלת מובילים";
+                    btn.innerText = "המשך לשאלה הבאה";
+                    btn.onclick = window.nextStep;
+                } else if (isLastQuestion && !isLastStage) {
+                    title.innerText = "סיכום יום " + currentStage;
+                    btn.innerText = "סיום המפגש וחזרה ללובי";
+                    btn.onclick = window.finishStage;
+                } else {
+                    // נגמר המשחק (יום אחרון, שאלה אחרונה)
+                    title.innerText = "🏆 סיום המשחק - המנצחים! 🏆";
+                    btn.innerText = "סיום המשחק";
+                    btn.onclick = window.finishStage;
+                }
             }
 
             window.showScreen('leaderboard');
