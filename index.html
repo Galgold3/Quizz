@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>על פסי הרכבת: המערכות שמניעות קדימה</title>
+    <title>יסודות ההצלחה: קורס מבוא להנדסת תשתיות</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     
-    <!-- Updated Tailwind CSS via CDN for development, ignoring the production warning -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -68,7 +67,7 @@
                 <span class="text-4xl font-black text-white tracking-tight">משחק טריוויה</span>
             </div>
 
-            <h1 class="text-4xl font-black mb-8 text-white leading-tight">על פסי הרכבת:<br>המערכות שמניעות קדימה</h1>
+            <h1 class="text-3xl font-black mb-8 text-white leading-tight">יסודות ההצלחה:<br>קורס מבוא להנדסת תשתיות</h1>
             
             <div class="flex flex-col mb-12">
                 <p class="text-indigo-300 font-black text-3xl leading-[0.9]">הזינו שם משתמש קבוע</p>
@@ -90,9 +89,8 @@
     <div id="screen-lobby" class="hidden min-h-screen flex flex-col">
         <header class="bg-slate-900/50 backdrop-blur-md p-5 border-b border-slate-800 flex justify-between items-center sticky top-0 z-50">
             <div class="flex items-center gap-5">
-                <button onclick="window.showScreen('adminLogin')" class="text-slate-500 hover:text-indigo-400 transition-colors text-2xl" title="לוח בקרה למנהלים">⚙️</button>
-                <button onclick="window.showStandaloneLeaderboard()" class="text-amber-400 hover:text-amber-300 transition-colors text-2xl drop-shadow-md" title="צפייה בטבלת המובילים">🏆</button>
-                <div class="flex flex-col border-r-2 border-slate-700 pr-5">
+                <button onclick="window.showScreen('adminLogin')" class="text-slate-500 hover:text-indigo-400 transition-colors text-2xl">⚙️</button>
+                <div class="flex flex-col">
                     <span class="text-slate-500 text-[10px] uppercase font-bold tracking-tighter">משתמש מחובר</span>
                     <span id="display-name" class="text-white font-black text-lg">---</span>
                 </div>
@@ -102,14 +100,9 @@
                 <span id="display-score" class="font-black text-2xl text-white leading-none">0</span>
             </div>
         </header>
-        <main class="flex-1 p-8 flex flex-col items-center justify-center relative">
-            
+        <main class="flex-1 p-8 flex flex-col items-center justify-center">
             <h2 class="text-4xl font-black mb-12 text-slate-100">שלבי האתגר:</h2>
-            <div id="stages-grid" class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-2xl text-center mb-8"></div>
-            
-            <button onclick="window.showStandaloneLeaderboard()" class="mt-8 bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 px-8 py-4 rounded-3xl font-black text-xl transition-all shadow-lg flex items-center gap-3 btn-active">
-                <span>🏆</span> טבלת המובילים המלאה
-            </button>
+            <div id="stages-grid" class="grid grid-cols-2 gap-8 w-full max-w-3xl text-center"></div>
         </main>
     </div>
 
@@ -118,62 +111,58 @@
             <div id="feedback-content" class="text-8xl font-black px-16 py-10 rounded-[4rem] shadow-2xl transform"></div>
         </div>
         <header class="bg-slate-900 p-5 flex justify-between items-center border-b border-slate-800">
-            <div id="q-progress" class="bg-slate-800 px-5 py-2 rounded-full text-xs font-black text-indigo-400 tracking-widest uppercase">DAY 0 | Q 0/0</div>
+            <div id="q-progress" class="bg-slate-800 px-5 py-2 rounded-full text-xs font-black text-indigo-400 tracking-widest uppercase">STAGE 0 | Q 0/0</div>
             <div class="flex items-center gap-4">
                 <span class="text-slate-500 text-sm font-black uppercase">זמן:</span>
                 <div class="text-4xl font-black text-white w-14 text-center font-mono" id="timer-num">45</div>
             </div>
-            <button onclick="window.exitGameToLobby()" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400 hover:text-white transition-colors">✖</button>
+            <button onclick="window.showScreen('lobby')" class="w-12 h-12 flex items-center justify-center bg-slate-800 rounded-2xl text-slate-400">✖</button>
         </header>
         <div class="h-3 w-full bg-slate-900">
             <div id="timer-bar" class="h-full bg-indigo-500" style="width:100%"></div>
         </div>
         <div class="flex-1 flex items-center justify-center p-10 text-center">
-            <h2 id="question-text" class="text-4xl md:text-5xl font-black leading-tight text-white drop-shadow-xl"></h2>
+            <h2 id="question-text" class="text-4xl md:text-6xl font-black leading-tight text-white drop-shadow-xl"></h2>
         </div>
         <div id="options-grid" class="p-8 grid grid-cols-1 md:grid-cols-2 gap-6 max-w-6xl mx-auto w-full mb-12"></div>
     </div>
 
-    <div id="screen-leaderboard" class="hidden min-h-screen flex flex-col p-8 items-center justify-center bg-slate-950 relative">
-        <!-- Close button for standalone mode -->
-        <button id="close-leaderboard-btn" onclick="window.showScreen('lobby')" class="hidden absolute top-8 left-8 w-14 h-14 flex items-center justify-center bg-slate-900 rounded-full text-slate-400 hover:text-white hover:bg-slate-800 border border-slate-800 transition-all text-2xl z-50 shadow-xl btn-active">✖</button>
-        
-        <div class="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-600 rounded-3xl flex items-center justify-center mb-8 shadow-2xl rotate-6 mt-10">
+    <div id="screen-leaderboard" class="hidden min-h-screen flex flex-col p-8 items-center justify-center bg-slate-950">
+        <div class="w-24 h-24 bg-gradient-to-br from-amber-400 to-orange-600 rounded-3xl flex items-center justify-center mb-8 shadow-2xl rotate-6">
             <span class="text-5xl -rotate-6">🏆</span>
         </div>
-        <h2 id="leaderboard-title" class="text-5xl font-black mb-10 text-white tracking-tight text-center">טבלת מובילים</h2>
+        <h2 class="text-5xl font-black mb-10 text-white tracking-tight">המובילים בקורס</h2>
         <div class="glass-panel w-full max-w-2xl rounded-[3rem] border border-slate-800 shadow-2xl overflow-hidden">
             <table class="w-full text-right">
                 <thead class="bg-slate-900/80 text-slate-500 uppercase text-[10px] font-black tracking-widest">
-                    <tr><th class="p-6 text-center w-24">מקום</th><th class="p-6">שם המשתמש</th><th class="p-6 text-left">ניקוד מצטבר</th></tr>
+                    <tr><th class="p-6 text-center w-24">Rank</th><th class="p-6">Name</th><th class="p-6 text-left">Score</th></tr>
                 </thead>
                 <tbody id="leaderboard-body" class="divide-y divide-slate-800/50"></tbody>
             </table>
         </div>
-        <button id="leaderboard-next-btn" onclick="window.nextStep()" class="mt-12 bg-indigo-600 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl btn-active border-b-4 border-indigo-900 hover:bg-indigo-500 transition-colors">השאלה הבאה</button>
+        <button onclick="window.nextStep()" class="mt-12 bg-indigo-600 px-20 py-6 rounded-3xl font-black text-2xl shadow-2xl btn-active border-b-4 border-indigo-900">המשך לאתגר הבא</button>
     </div>
 
     <div id="screen-adminDashboard" class="hidden min-h-screen flex flex-col p-8 bg-slate-950 overflow-hidden">
-        <header class="flex justify-between items-center mb-10 border-b border-slate-800 pb-8 flex-wrap gap-4">
+        <header class="flex justify-between items-center mb-10 border-b border-slate-800 pb-8">
             <div>
                 <h1 class="text-4xl font-black text-white">Console הניהול</h1>
                 <p class="text-indigo-500 font-bold text-sm uppercase tracking-widest">Question Bank & System Control</p>
             </div>
-            <div class="flex gap-4 flex-wrap">
-                <button onclick="window.forceSeedQuestions()" class="bg-emerald-950/40 text-emerald-400 border border-emerald-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase hover:bg-emerald-900/60 transition-colors">Load New Questions (DANGER)</button>
-                <button onclick="window.resetAllScores()" class="bg-rose-950/30 text-rose-500 border border-rose-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase hover:bg-rose-900/50 transition-colors">Clear All Players</button>
-                <button onclick="window.showScreen('lobby')" class="bg-slate-800 text-slate-200 px-8 py-2 rounded-2xl text-xs font-black hover:bg-slate-700 transition-colors">Lobby</button>
+            <div class="flex gap-4">
+                <button onclick="window.resetAllScores()" class="bg-rose-950/30 text-rose-500 border border-rose-900/50 px-6 py-2 rounded-2xl text-xs font-black uppercase">Clear All Players & Data</button>
+                <button onclick="window.showScreen('lobby')" class="bg-slate-800 text-slate-200 px-8 py-2 rounded-2xl text-xs font-black">Lobby</button>
             </div>
         </header>
         <div class="flex-1 flex flex-col lg:flex-row gap-10 overflow-hidden">
             <div class="w-full lg:w-96 glass-panel p-8 rounded-[3rem] h-fit">
-                <h3 class="font-black mb-8 text-indigo-400 border-b border-slate-800 pb-4 uppercase text-xs tracking-widest">Day Activation</h3>
+                <h3 class="font-black mb-8 text-indigo-400 border-b border-slate-800 pb-4 uppercase text-xs tracking-widest">Stage Activation</h3>
                 <div id="admin-toggles" class="space-y-5"></div>
             </div>
             <div class="flex-1 glass-panel p-10 rounded-[3rem] flex flex-col overflow-hidden">
                 <div class="flex justify-between items-center mb-8">
                     <h3 class="font-black text-indigo-400 uppercase text-xs tracking-widest">Question Bank</h3>
-                    <button onclick="window.addQuestion()" class="bg-indigo-600 px-8 py-3 rounded-2xl text-sm font-black hover:bg-indigo-500 transition-colors">+ New Question</button>
+                    <button onclick="window.addQuestion()" class="bg-indigo-600 px-8 py-3 rounded-2xl text-sm font-black">+ New Question</button>
                 </div>
                 <div id="admin-questions" class="flex-1 overflow-y-auto pr-4 space-y-8"></div>
             </div>
@@ -209,9 +198,9 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
-        let myData = { name: '', score: 0, completedStages: [], stageProgress: {} };
+        let myData = { name: '', score: 0, completedStages: [] };
         let allQuestions = [];
-        let gameSettings = { stage1: true, stage2: false };
+        let gameSettings = { stage1: true, stage2: false, stage3: false, stage4: false };
         let currentStage = null, currentQIndex = 0, timer = 45, timerId = null;
 
         window.showScreen = (id) => {
@@ -228,7 +217,7 @@
             const playerDocRef = doc(db, "players", name);
             const playerSnap = await getDoc(playerDocRef);
             if (playerSnap.exists()) { myData = playerSnap.data(); }
-            else { myData = { name, score: 0, completedStages: [], stageProgress: {}, createdAt: Date.now() }; await setDoc(playerDocRef, myData); }
+            else { myData = { name, score: 0, completedStages: [], createdAt: Date.now() }; await setDoc(playerDocRef, myData); }
             localStorage.setItem('quiz_user_name', name);
             updateLobbyUI(); window.showScreen('lobby');
             setupProfileListener(name);
@@ -242,48 +231,24 @@
 
         async function init() {
             try {
-                // Show loading screen immediately
-                document.getElementById('loading-overlay').classList.remove('hidden');
-                
                 await signInAnonymously(auth);
                 onAuthStateChanged(auth, async (u) => {
-                    if (u) { 
-                        document.getElementById('loading-overlay').classList.add('hidden'); 
-                        setupListeners(); 
-                        checkAutoLogin(); 
-                    }
+                    if (u) { document.getElementById('loading-overlay').classList.add('hidden'); setupListeners(); checkAutoLogin(); }
                 });
-            } catch (e) { 
-                console.error("Firebase Auth Error:", e);
-                // Hide loading overlay and show error toast if Firebase init fails (e.g. blocked by AdBlocker/Firewall)
-                document.getElementById('loading-overlay').classList.add('hidden');
-                document.getElementById('toast').innerText = "שגיאת תקשורת. ייתכן שחוסם פרסומות מופעל או שיש חסימת רשת.";
-                document.getElementById('toast').className = "fixed top-10 left-1/2 -translate-x-1/2 px-12 py-5 rounded-[2rem] text-white font-black shadow-2xl z-[3000] bg-rose-600 opacity-100";
-                document.getElementById('toast').classList.remove('hidden');
-                setTimeout(() => document.getElementById('toast').classList.add('hidden'), 5000);
-                
-                // Fallback: Show login screen so the user isn't stuck on a blank screen
-                window.showScreen('login');
-            }
+            } catch (e) { console.error(e); }
         }
 
         async function checkAutoLogin() {
             const saved = localStorage.getItem('quiz_user_name');
             if (saved) {
-                try {
-                    const d = await getDoc(doc(db, "players", saved));
-                    if (d.exists()) { myData = d.data(); updateLobbyUI(); window.showScreen('lobby'); setupProfileListener(saved); }
-                    else { window.showScreen('login'); }
-                } catch(e) {
-                     console.error("Error auto-login:", e);
-                     window.showScreen('login');
-                }
+                const d = await getDoc(doc(db, "players", saved));
+                if (d.exists()) { myData = d.data(); updateLobbyUI(); window.showScreen('lobby'); setupProfileListener(saved); }
             } else window.showScreen('login');
         }
 
         function setupListeners() {
             onSnapshot(doc(db, "settings", "game_state"), (snap) => {
-                gameSettings = snap.exists() ? snap.data() : { stage1: true, stage2: false };
+                gameSettings = snap.exists() ? snap.data() : { stage1: true, stage2: false, stage3: false, stage4: false };
                 renderStages(); renderAdminToggles();
             });
             onSnapshot(doc(db, "content", "questions"), (snap) => {
@@ -293,40 +258,12 @@
         }
 
         function setupProfileListener(name) {
-            onSnapshot(doc(db, "players", name), (snap) => { if (snap.exists()) { myData = Object.assign(myData, snap.data()); updateLobbyUI(); } });
+            onSnapshot(doc(db, "players", name), (snap) => { if (snap.exists()) { myData = snap.data(); updateLobbyUI(); } });
         }
 
-        // פונקציה לכפיית שמירת השאלות המעורבבות בענן
-        window.forceSeedQuestions = async () => {
-            if (!confirm("פעולה זו תדרוס את בנק השאלות הקיים בענן ותטען מחדש את השאלות המעודכנות מהקוד. להמשיך?")) return;
-            await seedInitialData();
-            window.showToast("בנק השאלות עודכן בהצלחה!", "bg-emerald-600");
-        };
-
         async function seedInitialData() {
-            const list = [
-                // יום ראשון 
-                { id: 101, stage: 1, text: "מהו התפקיד העיקרי של מערכת ATP במערכת CBTC?", options: ["מניעת התנגשויות, מהירות מופרזת ומצבים מסוכנים", "ניהול לוחות זמנים ותפעול הרכבות", "תקשורת בין הנהג למרכז הבקרה", "פתיחה וסגירה אוטומטית של דלתות"], correct: 0 },
-                { id: 102, stage: 1, text: "איזה רכיב במערכת CBTC מספק לרכבת מידע מיקום מדויק כאשר היא חולפת מעליו?", options: ["Zone Controller", "ATS", "Way-side Antenna", "Beacon"], correct: 3 },
-                { id: 103, stage: 1, text: "מה היתרון המרכזי של מערכת 'בלוק נע' (Moving Block) לעומת 'בלוק קבוע' (Fixed Block)?", options: ["שימוש בפחות תקשורת", "הקטנת המרווח בין רכבות והגדלת קיבולת הקו", "ביטול הצורך בבקרת רכבות", "הפעלת רכבות ללא אספקת חשמל"], correct: 1 },
-                { id: 104, stage: 1, text: "כמה רשתות תקשורת (CBN) נפרדות קיימות?", options: ["3", "5", "4", "6"], correct: 1 },
-                { id: 105, stage: 1, text: "מה הן ראשי התיבות של WWRS?", options: ["Wideband Wireless Radio System", "Wireless Worldwide Resource Solutions", "Wireless Wideband Radio System", "World Wide Radio System"], correct: 0 },
-                { id: 106, stage: 1, text: "איזו מערכת משותפת לאגף כספים, שירות, תפעול, ומערכות?", options: ["TAHPS", "PAS", "AFC", "URS"], correct: 2 },
-                { id: 107, stage: 1, text: "מהו תפקידו העיקרי של השנאי בתחנת ההשנאה?", options: ["להמיר זרם ישר לזרם חילופין", "להוריד את רמת המתח לרמה הנדרשת", "להפעיל את הגנרטורים", "לספק תאורת חירום בלבד"], correct: 1 },
-                { id: 108, stage: 1, text: "מהו תפקידו של תיל המגע (C.W) ברשת החשמול?", options: ["להעביר את האנרגיה לנייד החשמלי באמצעות מגע עם הפנטוגרף", "להחזיק את הרשת ולספוג את הכפף", "למנוע כפף בתיל המגע", "לתמוך בתורן החשמול"], correct: 0 },
-                { id: 109, stage: 1, text: "איזה אמצעי גיבוי מספק חשמל באופן מיידי ('בזמן אפס') עד להפעלת הגנרטורים?", options: ["תחנת השנאה", "מערכת OCS", "תיל המגע", "מצברים ו-UPS"], correct: 3 },
-
-                // יום שני
-                { id: 201, stage: 2, text: "מהו תפקיד הפנטוגרף ברכבת הקלה?", options: ["להעביר את החשמל מהרשת העילית אל הרכבת", "לחבר בין הקרונות", "לשלוט במערכת הבלימה", "לווסת את מערכת המיזוג"], correct: 0 },
-                { id: 202, stage: 2, text: "באיזו רמת GoA מתוכנן לפעול פרויקט המטרו?", options: ["GoA1 – שליטה מלאה של נהג", "GoA4 – ניהוג ושליטה אוטומטיים ללא נהג", "GoA2 – שליטה חלקית של נהג", "GoA3 – ניהוג אוטומטי עם נהג"], correct: 1 },
-                { id: 203, stage: 2, text: "כמה סוגי בלמים קיימים ברכבת הקלה?", options: ["סוג אחד", "שני סוגים", "שלושה סוגים", "ארבעה סוגים"], correct: 2 },
-                { id: 204, stage: 2, text: "מהם נתוני הבסיס המרכזיים הנדרשים לתכנון תוואי אופקי של מסילה?", options: ["סוג הקרון, צבע המסילה, מספר התחנות וגובה הרציף", "סוג האיתות, מערכת הכריזה, מספר הנהגים ותדירות התחזוקה", "סוג האדנים, עובי פלטת הבטון, מערכת הניקוז וסוג הריצוף", "מהירות תכן, הנחיות מסילתיות, סכמה תפעולית וגבולות סטטוטוריים"], correct: 3 },
-                { id: 205, stage: 2, text: "מה ההבדל המרכזי בין Slab Track לבין Ballasted Track?", options: ["Slab Track מבוססת על פלטת בטון, בעוד Ballasted Track מבוססת על רבד חצץ", "Slab Track משמשת רק במנהרות, בעוד Ballasted Track משמשת רק בתוואי עילי", "Slab Track מיועדת רק לרכבת קלה, בעוד Ballasted Track מיועדת רק למטרו", "אין הבדל במבנה שלהן; ההבדל הוא רק בעלויות התחזוקה"], correct: 0 },
-                { id: 206, stage: 2, text: "מהם התפקידים המרכזיים של אביזרי החיבור (Fasteners) במבנה המסילה?", options: ["להוביל את מי הניקוז מהמסילה אל מערכת הביוב", "לקבע את הפסים, לשמור על גיאומטריית המסילה, להעביר עומסים, להפחית רעידות ולספק בידוד חשמלי", "לאפשר לרכבת לשנות מסילה ללא שימוש במפלגים", "להגן על המסילה מפני פגיעות של כלי רכב בצמתים בלבד"], correct: 1 },
-                { id: 207, stage: 2, text: "מי היה נורברט ווינר?", options: ["ממציא ה-firewall הראשון", "שותף של ביל גייטס בייסוד מיקרוסופט", "הוגה מדע הבקרה והתקשורת בין יצור חי למכונה", "מייסד WhatsApp"], correct: 2 },
-                { id: 208, stage: 2, text: "מה מחייבת רגולציית הסייבר על נת\"ע?", options: ["ביצוע פעולות לאבטחת מערכות ממוחשבות ושמירה על המידע", "דיווח על כל ניסיון או תקיפת סייבר על המערכות", "הגנה טוטאלית על מערכות הרכבות", "אין רגולציית סייבר בישראל"], correct: 0 },
-                { id: 209, stage: 2, text: "מהם האיומים העיקריים בסייבר?", options: ["מפגע פנימי, תוקף חיצוני, טכנולוגיות חדשות, שרשרת אספקה", "גורמים משפטיים, האקרים, פשיעת סייבר", "Zero day, חולשות ידועות, וירוסים, כופרות", "כל התשובות נכונות"], correct: 0 }
-            ];
+            const list = [];
+            for(let s=1; s<=4; s++) { for(let q=1; q<=5; q++) { list.push({ id: Date.now() + Math.random(), stage: s, text: `שאלה ${q}`, options: ["1", "2", "3", "4"], correct: 0 }); } }
             await setDoc(doc(db, "content", "questions"), { list });
         }
 
@@ -337,29 +274,15 @@
 
         function renderStages() {
             const grid = document.getElementById('stages-grid'); if (!grid) return; grid.innerHTML = '';
-            for (let i = 1; i <= 2; i++) {
+            for (let i = 1; i <= 4; i++) {
                 const isOpen = gameSettings[`stage${i}`], isDone = myData.completedStages?.includes(i);
-                
-                // Retrieve the saved progress for the stage to show a percentage, default to 0
-                const stageProgress = myData.stageProgress && myData.stageProgress[i] ? myData.stageProgress[i] : 0;
-                const stageQs = allQuestions.filter(q => q.stage == i);
-                const progressText = stageQs.length > 0 ? `(${stageProgress}/${stageQs.length})` : '';
-
                 const btn = document.createElement('button');
                 btn.className = `p-12 rounded-[2.5rem] border-2 font-black text-2xl transition-all shadow-xl flex flex-col items-center justify-center gap-3 ${
                     isDone ? 'bg-emerald-900/40 border-emerald-500 text-emerald-300' :
                     isOpen ? 'bg-indigo-600/10 border-indigo-500/50 hover:bg-indigo-600/30' : 'bg-slate-900 border-slate-800 opacity-50 cursor-not-allowed'
                 }`;
-                btn.innerHTML = `יום ${i} ${isOpen && !isDone ? progressText : ''}<span class="text-[10px] uppercase opacity-60">${isDone ? 'COMPLETED' : isOpen ? (stageProgress > 0 ? 'IN PROGRESS' : 'OPEN') : 'LOCKED'}</span>`;
-                if (isOpen && !isDone) {
-                    btn.onclick = () => { 
-                        currentStage = i; 
-                        // Start the game from the saved progress index
-                        currentQIndex = myData.stageProgress && myData.stageProgress[i] ? myData.stageProgress[i] : 0;
-                        window.showScreen('game'); 
-                        loadQuestion(); 
-                    };
-                }
+                btn.innerHTML = `מפגש ${i}<span class="text-[10px] uppercase opacity-60">${isDone ? 'COMPLETED' : isOpen ? 'OPEN' : 'LOCKED'}</span>`;
+                if (isOpen && !isDone) btn.onclick = () => { currentStage = i; currentQIndex = 0; window.showScreen('game'); loadQuestion(); };
                 grid.appendChild(btn);
             }
         }
@@ -367,9 +290,9 @@
         function loadQuestion() {
             clearInterval(timerId);
             const stageQs = allQuestions.filter(q => q.stage == currentStage);
-            if (!stageQs[currentQIndex]) return window.finishStage();
+            if (!stageQs[currentQIndex]) return finishStage();
             const q = stageQs[currentQIndex];
-            document.getElementById('q-progress').innerText = `DAY ${currentStage} | Q ${currentQIndex + 1}/${stageQs.length}`;
+            document.getElementById('q-progress').innerText = `STAGE ${currentStage} | Q ${currentQIndex + 1}/${stageQs.length}`;
             document.getElementById('question-text').innerText = q.text;
             const grid = document.getElementById('options-grid'); grid.innerHTML = '';
             q.options.forEach((opt, i) => {
@@ -392,132 +315,48 @@
             clearInterval(timerId);
             const isCorrect = idx === correct;
             const pop = document.getElementById('feedback-pop'), content = document.getElementById('feedback-content');
-            
-            // Disable all answer buttons to prevent multiple clicks
-            const buttons = document.querySelectorAll('.answer-btn');
-            buttons.forEach(btn => btn.disabled = true);
-
-            // Increment the current question index
-            currentQIndex++;
-
-            if (!myData.stageProgress) {
-                myData.stageProgress = {};
-            }
-            // Save the progress for the current stage
-            myData.stageProgress[currentStage] = currentQIndex;
-
             if (isCorrect) {
                 const bonus = 1000 + (timer * 50); myData.score += bonus;
                 content.innerText = `+${bonus}`;
                 content.className = "text-8xl font-black bg-emerald-600 px-14 py-8 rounded-[3rem] animate-bounce text-white shadow-2xl";
-                
+                await updateDoc(doc(db, "players", myData.name), { score: myData.score });
             } else {
                 content.innerText = idx === -1 ? "TIME UP!" : "WRONG!";
                 content.className = "text-8xl font-black bg-rose-600 px-14 py-8 rounded-[3rem] animate-pulse text-white shadow-2xl";
             }
-            
-            // Save the updated score and progress to Firebase
-            try {
-                await updateDoc(doc(db, "players", myData.name), { 
-                    score: myData.score,
-                    stageProgress: myData.stageProgress
-                });
-            } catch(e) { console.error("Error saving score:", e); }
-
             pop.classList.remove('hidden');
-            
-            // הצגת טבלת המובילים לאחר 2 שניות של פידבק
-            setTimeout(() => { 
-                pop.classList.add('hidden'); 
-                showLeaderboard(false); 
-            }, 2000);
+            setTimeout(() => { pop.classList.add('hidden'); showLeaderboard(); }, 2000);
         }
-        
-        // Handles exiting the game manually via the 'X' button
-        window.exitGameToLobby = () => {
-             clearInterval(timerId);
-             window.showScreen('lobby');
-        };
 
-        // פונקציה להצגת טבלת המובילים באופן עצמאי (מהלובי)
-        window.showStandaloneLeaderboard = () => {
-            showLeaderboard(true);
-        };
-
-        // הוספנו פרמטר isStandalone כדי להבדיל בין צפייה יזומה מהלובי לבין מעבר טבעי במשחק
-        async function showLeaderboard(isStandalone = false) {
-            try {
-                const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
-                const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
-                let rank = 1;
-                qSnap.forEach(d => {
-                    const p = d.data(); const isMe = p.name === myData.name;
-                    body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
-                        <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
-                        <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
-                        <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
-                    rank++;
-                });
-            } catch (e) {
-                console.error("Error fetching leaderboard:", e);
-                document.getElementById('leaderboard-body').innerHTML = '<tr><td colspan="3" class="p-6 text-center">שגיאה בטעינת הנתונים</td></tr>';
-            }
-
-            const title = document.getElementById('leaderboard-title');
-            const btn = document.getElementById('leaderboard-next-btn');
-            const closeBtn = document.getElementById('close-leaderboard-btn');
-            
-            // אם נכנסנו לטבלה בצורה יזומה מהלובי
-            if (isStandalone) {
-                title.innerText = "טבלת מובילים";
-                btn.classList.add('hidden'); // מסתירים את כפתור ההמשך
-                closeBtn.classList.remove('hidden'); // מציגים כפתור יציאה (X)
-            } else {
-                // ניהול הכותרות והכפתורים בצורה חכמה בהתאם למצב במשחק
-                const stageQs = allQuestions.filter(q => q.stage == currentStage);
-                // currentQIndex has already been incremented in checkAnswer
-                const isLastQuestion = currentQIndex >= stageQs.length;
-                const isLastStage = currentStage === 2;
-                
-                btn.classList.remove('hidden');
-                closeBtn.classList.add('hidden');
-
-                if (!isLastQuestion) {
-                    title.innerText = "טבלת מובילים";
-                    btn.innerText = "המשך לשאלה הבאה";
-                    btn.onclick = window.nextStep;
-                } else if (isLastQuestion && !isLastStage) {
-                    title.innerText = "סיכום יום " + currentStage;
-                    btn.innerText = "סיום המפגש וחזרה ללובי";
-                    btn.onclick = window.finishStage;
-                } else {
-                    // נגמר המשחק (יום אחרון, שאלה אחרונה)
-                    title.innerText = "🏆 סיום המשחק - המנצחים! 🏆";
-                    btn.innerText = "סיום המשחק";
-                    btn.onclick = window.finishStage;
-                }
-            }
-
+        async function showLeaderboard() {
+            const qSnap = await getDocs(query(collection(db, "players"), orderBy("score", "desc"), limit(5)));
+            const body = document.getElementById('leaderboard-body'); body.innerHTML = '';
+            let rank = 1;
+            qSnap.forEach(d => {
+                const p = d.data(); const isMe = p.name === myData.name;
+                body.innerHTML += `<tr class="${isMe ? 'bg-indigo-600/10 text-indigo-300' : ''}">
+                    <td class="p-6 text-center font-black">${rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank}</td>
+                    <td class="p-6 font-bold">${p.name} ${isMe ? '(אתה)' : ''}</td>
+                    <td class="p-6 text-left font-mono font-black">${(p.score || 0).toLocaleString()}</td></tr>`;
+                rank++;
+            });
             window.showScreen('leaderboard');
         }
 
         window.nextStep = () => {
-            // currentQIndex is now incremented in checkAnswer, so we don't increment it here
-            window.showScreen('game'); 
-            loadQuestion();
+            currentQIndex++; const stageQs = allQuestions.filter(q => q.stage == currentStage);
+            if (currentQIndex < stageQs.length) { window.showScreen('game'); loadQuestion(); }
+            else finishStage();
         };
 
-        // EXPORT THE FUNCTION TO WINDOW SO THE BUTTON CAN ACCESS IT
-        window.finishStage = async () => {
+        async function finishStage() {
             if (!myData.completedStages.includes(currentStage)) {
                 myData.completedStages.push(currentStage);
-                try {
-                    await updateDoc(doc(db, "players", myData.name), { completedStages: myData.completedStages });
-                } catch(e) { console.error("Error updating completed stages:", e); }
+                await updateDoc(doc(db, "players", myData.name), { completedStages: myData.completedStages });
             }
-            window.showToast(`סיימת את יום ${currentStage}!`, "bg-emerald-600");
+            window.showToast(`סיימת את מפגש ${currentStage}!`, "bg-emerald-600");
             window.showScreen('lobby');
-        };
+        }
 
         // --- ADMIN ---
         window.addQuestion = async () => {
@@ -543,11 +382,11 @@
 
         function renderAdminToggles() {
             const cont = document.getElementById('admin-toggles'); if(!cont) return; cont.innerHTML = '';
-            for (let i = 1; i <= 2; i++) {
+            for (let i = 1; i <= 4; i++) {
                 const active = gameSettings[`stage${i}`];
                 const div = document.createElement('div');
                 div.className = "flex justify-between items-center p-5 bg-slate-900 rounded-xl border border-slate-800";
-                div.innerHTML = `<span>Day ${i}</span><input type="checkbox" ${active ? 'checked' : ''} onchange="window.updateStage(${i}, this.checked)" class="w-6 h-6">`;
+                div.innerHTML = `<span>Stage ${i}</span><input type="checkbox" ${active ? 'checked' : ''} onchange="window.updateStage(${i}, this.checked)" class="w-6 h-6">`;
                 cont.appendChild(div);
             }
         }
